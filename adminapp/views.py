@@ -123,7 +123,7 @@ def login(request):
                 messages.success(request, 'You are now logged in.')
                 
                 # Redirect based on role
-                if user.is_superuser:
+                if user.is_superadmin:
                     return redirect('admin_dashboard')
                 elif user.roles == 'Teacher':
                     return redirect('teacher_dashboard')

@@ -135,10 +135,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'abincj.tinosoftec@gmail.com'  
 EMAIL_HOST_PASSWORD = 'zrfp tbwd zzqq iqbi'  
 
-# AUTH_USER_MODEL = 'adminapp.Account'
-
+AUTH_USER_MODEL = 'adminapp.Account'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'adminapp.authentication.EmailAuthBackend', 
 ]
