@@ -16,5 +16,9 @@ urlpatterns = [
     path('parent_dashboard/',views.parent_dashboard, name='parent_dashboard'),
     
     
+    
+    path('all_users_list', views.all_users_list, name='all_users_list'),
+    path('roles', views.roles, name='roles'),
+    
 ]
 

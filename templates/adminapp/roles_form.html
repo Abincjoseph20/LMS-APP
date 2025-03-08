@@ -1,0 +1,369 @@
+{% extends "dashboard/admin_dashboard.html" %}
+{% load static %}
+
+{% block content %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            list-style: none;
+        }
+        
+        .nav-item {
+            padding: 10px 20px;
+            margin-right: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .nav-item.active {
+            background-color: #78c9e6;
+            color: white;
+        }
+        
+        .nav-item:not(.active) {
+            background-color: transparent;
+            color: #78c9e6;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 14px;
+        }
+        
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        table tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            justify-content: center;
+        }
+        
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .module-column {
+            width: 30%;
+        }
+        
+        .permission-column {
+            width: 70%;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .permission-header {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .permission-item {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .name-input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .name-input-group .form-control {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-group">
+            <label for="role-name">Name<span style="color: #ff6b6b;">*</span></label>
+            <div class="name-input-group">
+                <input type="text" id="role-name" class="form-control" placeholder="Enter Role Name">
+                <select id="role-search" class="form-control">
+                    <option value="">Search and select role</option>
+                    <!-- Populate this with options dynamically -->
+                    <option value="role1">Role 1</option>
+                    <option value="role2">Role 2</option>
+                    <option value="role3">Role 3</option>
+                </select>
+                <select id="role-type" class="form-control">
+                    <option value="">Select Role Type</option>
+                    <!-- Populate this with options dynamically -->
+                    <option value="admin">Admin</option>
+                    <option value="manager">Manager</option>
+                    <option value="user">User</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="nav-tabs">
+            <div class="nav-item active">Staff</div>
+            <div class="nav-item">CRM</div>
+            <div class="nav-item">Project</div>
+            <div class="nav-item">HRM</div>
+            <div class="nav-item">Account</div>
+            <div class="nav-item">POS</div>
+        </div>
+        
+        <h2 class="section-title">Assign General Permission to Roles</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">
+                        <input type="checkbox" id="select-all">
+                    </th>
+                    <th style="width: 25%;">MODULE</th>
+                    <th style="width: 70%;">PERMISSIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>User</td>
+                    <td>
+                        <div class="permission-column">
+                            <div class="permission-item">
+                                <input type="checkbox"> Manage
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Create
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Edit
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Delete
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>Role</td>
+                    <td>
+                        <div class="permission-column">
+                            <div class="permission-item">
+                                <input type="checkbox"> Manage
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Create
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Edit
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Delete
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>Client</td>
+                    <td>
+                        <div class="permission-column">
+                            <div class="permission-item">
+                                <input type="checkbox"> Manage
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Create
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Edit
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Delete
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>Product & service</td>
+                    <td>
+                        <div class="permission-column">
+                            <div class="permission-item">
+                                <input type="checkbox"> Manage
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Create
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Edit
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Delete
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>Constant unit</td>
+                    <td>
+                        <div class="permission-column">
+                            <div class="permission-item">
+                                <input type="checkbox"> Manage
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Create
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Edit
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Delete
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>Constant tax</td>
+                    <td>
+                        <div class="permission-column">
+                            <div class="permission-item">
+                                <input type="checkbox"> Manage
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Create
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Edit
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Delete
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>Constant category</td>
+                    <td>
+                        <div class="permission-column">
+                            <div class="permission-item">
+                                <input type="checkbox"> Manage
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Create
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Edit
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Delete
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>Zoom meeting</td>
+                    <td>
+                        <div class="permission-column">
+                            <div class="permission-item">
+                                <input type="checkbox"> Manage
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Create
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Delete
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Show
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>Company settings</td>
+                    <td>
+                        <div class="permission-column">
+                            <div class="permission-item">
+                                <input type="checkbox"> Manage
+                            </div>
+                            <div class="permission-item"></div>
+                            <div class="permission-item"></div>
+                            <div class="permission-item"></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>Permission</td>
+                    <td>
+                        <div class="permission-column">
+                            <div class="permission-item">
+                                <input type="checkbox"> Manage
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Create
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Edit
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox"> Delete
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+{% endblock %}

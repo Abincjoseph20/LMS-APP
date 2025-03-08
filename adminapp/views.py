@@ -7,6 +7,8 @@ from .forms import RegistrationForms,LoginForm
 import random
 from django.contrib.auth import logout,authenticate
 from .forms import LoginForm
+from django.contrib.auth.decorators import login_required
+from.decorators import allowed_roles
 
 
 def generate_otp():
@@ -164,3 +166,14 @@ def student_dashboard(request):
 
 def parent_dashboard(request):
     return render(request, 'dashboard/parent_dashboard.html')
+
+
+@login_required
+@allowed_roles(['admin'])
+def all_users_list(request):
+    users = Account.objects.all()
+    return render(request,'adminapp/all_user_list.html',{'users':users}) 
+
+
+def roles(request):
+    return render(request,'adminapp/roles_form.html')
