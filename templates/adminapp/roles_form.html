@@ -9,22 +9,24 @@
             box-sizing: border-box;
             font-family: Arial, sans-serif;
         }
-        
+
+        /* Add padding to the body to avoid overlapping with the navbar */
         body {
+            padding-top: 80px; /* Adjust this value based on your navbar height */
             padding: 20px;
             background-color: #ffffff;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
         }
-        
+
         .form-control {
             width: 100%;
             padding: 10px;
@@ -32,338 +34,240 @@
             border-radius: 4px;
             font-size: 14px;
         }
-        
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-container .form-control {
+            flex: 1;
+        }
+
+        .search-wrapper {
+            display: flex;
+            flex: 1;
+            gap: 5px;
+        }
+
+        .search-btn {
+            padding: 10px 20px;
+            background-color:  #696cff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .search-btn:hover {
+            background-color:  #696cff;
+        }
+
         .nav-tabs {
             display: flex;
             margin-bottom: 20px;
             list-style: none;
         }
-        
+
         .nav-item {
             padding: 10px 20px;
             margin-right: 5px;
             cursor: pointer;
             border-radius: 4px;
             font-size: 14px;
+            border: none;
+            background-color: transparent;
+            color:   #696cff;
         }
-        
+
         .nav-item.active {
-            background-color: #78c9e6;
+            background-color: #696cff;
             color: white;
         }
-        
-        .nav-item:not(.active) {
-            background-color: transparent;
-            color: #78c9e6;
-        }
-        
+
         .section-title {
             font-size: 18px;
             margin-bottom: 20px;
             font-weight: bold;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
-        
+
         table th, table td {
             padding: 12px 15px;
             text-align: left;
             font-size: 14px;
         }
-        
+
         table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        
+
         table tr:nth-child(odd) {
             background-color: #f2f2f2;
         }
-        
+
         .checkbox-container {
             display: flex;
-            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
-        
+
         input[type="checkbox"] {
             width: 16px;
             height: 16px;
+            cursor: pointer;
         }
-        
+
         .module-column {
             width: 30%;
         }
-        
+
         .permission-column {
             width: 70%;
             display: flex;
             justify-content: space-between;
         }
-        
-        .permission-header {
-            display: flex;
-            justify-content: space-between;
-        }
-        
+
         .permission-item {
             flex: 1;
             display: flex;
+            align-items: center;
             justify-content: center;
+            gap: 5px;
         }
-        
-        .name-input-group {
-            display: flex;
-            gap: 10px;
+
+        .submit-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color:  #696cff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
         }
-        
-        .name-input-group .form-control {
-            flex: 1;
+
+        .submit-btn:hover {
+            background-color: #696cff;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="form-group">
-            <label for="role-name">Name<span style="color: #ff6b6b;">*</span></label>
-            <div class="name-input-group">
-                <input type="text" id="role-name" class="form-control" placeholder="Enter Role Name">
-                <select id="role-search" class="form-control">
-                    <option value="">Search and select role</option>
-                    <!-- Populate this with options dynamically -->
-                    <option value="role1">Role 1</option>
-                    <option value="role2">Role 2</option>
-                    <option value="role3">Role 3</option>
-                </select>
-                <select id="role-type" class="form-control">
-                    <option value="">Select Role Type</option>
-                    <!-- Populate this with options dynamically -->
-                    <option value="admin">Admin</option>
-                    <option value="manager">Manager</option>
-                    <option value="user">User</option>
-                </select>
-            </div>
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Table / </span>Users Roles</h4>
+
+        <!-- Search & Select Fields -->
+        <div class="search-container">
+            <!-- Search and Select Role Dropdown -->
+            <select id="role-dropdown" class="form-control">
+                <option value="">Search and select role</option>
+                {% if user %}
+                    <option value="{{user.id}}" selected>{{user.first_name}} {{user.last_name}}</option>
+                {% endif %}
+            </select>
+
+            <!-- Select Role Type Dropdown -->
+            <select id="role-type" class="form-control">
+                <option value="">Select Role Type</option>
+                <option value="admin" {% if user.roles == 'admin' %}selected{% endif %}>Admin</option>
+                <option value="student" {% if user.roles == 'student' %}selected{% endif %}>Student</option>
+                <option value="Teacher" {% if user.roles == 'Teacher' %}selected{% endif %}>Teacher</option>
+                <option value="Parent" {% if user.roles == 'Parent' %}selected{% endif %}>Parent</option> 
+                <option value="guest" {% if user.roles == 'guest' %}selected{% endif %}>Guest</option>
+            </select>
+
+            <!-- Search Form -->
+            <form method="GET" action="{% url 'search_and_select' %}" class="search-wrapper">
+                <input type="text" id="role-search" name="keyword" value="{{ request.GET.keyword }}" class="form-control" placeholder="Search by user key">
+                <button type="submit" class="search-btn">Search</button>
+            </form>
         </div>
-        
+
+        <!-- Navigation Tabs -->
         <div class="nav-tabs">
-            <div class="nav-item active">Staff</div>
-            <div class="nav-item">CRM</div>
-            <div class="nav-item">Project</div>
-            <div class="nav-item">HRM</div>
-            <div class="nav-item">Account</div>
-            <div class="nav-item">POS</div>
+            <button class="nav-item" data-role="admin" data-tab="staff">Admin</button>
+            <button class="nav-item" data-role="student" data-tab="crm">Student</button>
+            <button class="nav-item" data-role="teacher" data-tab="project">Teacher</button>
+            <button class="nav-item" data-role="guest" data-tab="hrm">Guest</button>
+            <button class="nav-item" data-role="parent" data-tab="account">Parent</button>
         </div>
-        
-        <h2 class="section-title">Assign General Permission to Roles</h2>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 5%;">
-                        <input type="checkbox" id="select-all">
-                    </th>
-                    <th style="width: 25%;">MODULE</th>
-                    <th style="width: 70%;">PERMISSIONS</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>User</td>
-                    <td>
-                        <div class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox"> Manage
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Create
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Edit
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Delete
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>Role</td>
-                    <td>
-                        <div class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox"> Manage
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Create
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Edit
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Delete
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>Client</td>
-                    <td>
-                        <div class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox"> Manage
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Create
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Edit
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Delete
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>Product & service</td>
-                    <td>
-                        <div class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox"> Manage
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Create
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Edit
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Delete
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>Constant unit</td>
-                    <td>
-                        <div class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox"> Manage
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Create
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Edit
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Delete
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>Constant tax</td>
-                    <td>
-                        <div class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox"> Manage
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Create
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Edit
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Delete
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>Constant category</td>
-                    <td>
-                        <div class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox"> Manage
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Create
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Edit
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Delete
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>Zoom meeting</td>
-                    <td>
-                        <div class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox"> Manage
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Create
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Delete
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Show
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>Company settings</td>
-                    <td>
-                        <div class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox"> Manage
-                            </div>
-                            <div class="permission-item"></div>
-                            <div class="permission-item"></div>
-                            <div class="permission-item"></div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>Permission</td>
-                    <td>
-                        <div class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox"> Manage
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Create
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Edit
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox"> Delete
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+
+        {% if user.roles == 'admin' %} {% include "adminapp/admin_roles_form.html" %} {% endif %}
+        {% if user.roles == 'student' %} {% include "student/student_roles_form.html" %} {% endif %}
+        {% if user.roles == 'teacher' %} {% include "teacher/teacher_roles_form.html" %} {% endif %}
+        {% if user.roles == 'parant' %} {% include "parant/parant_roles_form.html" %} {% endif %}
+        {% if user.roles == 'guest' %} {% include "guest/guest_roles_form.html" %} {% endif %}
+
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Handle tab switching based on user role
+            const buttons = document.querySelectorAll('.nav-item');
+            const userRole = "{{ user.roles|lower }}"; // Get user role from Django and convert to lowercase
+
+            // Set active class based on user role
+            buttons.forEach(button => {
+                if (button.dataset.role === userRole) {
+                    buttons.forEach(btn => btn.classList.remove('active')); // Remove active from all
+                    button.classList.add('active'); // Add active to matched role
+                }
+            });
+
+            // Handle manual tab switching when clicking buttons
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                });
+            });
+
+            // Handle "Select All" checkbox functionality
+            const selectAllCheckbox = document.getElementById('select-all');
+            const moduleCheckboxes = document.querySelectorAll('.module-checkbox');
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function () {
+                    moduleCheckboxes.forEach(moduleCheckbox => {
+                        moduleCheckbox.checked = this.checked;
+                        togglePermissions(moduleCheckbox);
+                    });
+                });
+            }
+
+            // Handle individual module checkbox clicks
+            moduleCheckboxes.forEach(moduleCheckbox => {
+                moduleCheckbox.addEventListener('change', function () {
+                    togglePermissions(this);
+                    updateSelectAllCheckbox();
+                });
+            });
+
+            // Function to toggle permissions when module checkbox is clicked
+            function togglePermissions(moduleCheckbox) {
+                const row = moduleCheckbox.closest('tr');
+                if (row) {
+                    const permissions = row.querySelectorAll('.permission-checkbox');
+                    permissions.forEach(permission => {
+                        permission.checked = moduleCheckbox.checked;
+                    });
+                }
+            }
+
+            // Update "Select All" checkbox state based on module checkboxes
+            function updateSelectAllCheckbox() {
+                const allChecked = Array.from(moduleCheckboxes).every(checkbox => checkbox.checked);
+                selectAllCheckbox.checked = allChecked;
+            }
+        });
+    </script>
 </body>
+
+
 {% endblock %}

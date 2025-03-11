@@ -68,6 +68,7 @@ class Account(AbstractBaseUser):
     user_key = models.CharField(max_length=10, unique=True, editable=False, null=True, blank=True)
     otp = models.CharField(max_length=6, blank=True, null=True)
     roles = models.CharField(choices=CATEGORY_CHOICE,max_length=20)
+    address = models.TextField(blank=True, null=True)
     is_verified = models.BooleanField(default=False)
 
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -81,11 +82,22 @@ class Account(AbstractBaseUser):
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     objects = MyAccountManager()
-
+    
+    # def save(self, *args, **kwargs):
+    #     if not self.user_key:
+    #         self.user_key = Account.objects.generate_unique_alphanumeric_key()
+    #         #self.user_key = MyAccountManager().generate_unique_alphanumeric_key()  # Correcte
+    #         #self.user_key = self.__class__.objects.generate_unique_alphanumeric_key() 
+    #     super().save(*args, **kwargs)
+    
     def save(self, *args, **kwargs):
         if not self.user_key:
-            self.user_key = self.__class__.objects.generate_unique_alphanumeric_key()  # Corrected
+            self.user_key = Account.objects.generate_unique_alphanumeric_key()
         super().save(*args, **kwargs)
+        
+        
+        #     self.user_key = self.__class__.objects.generate_unique_alphanumeric_key()  # Corrected
+        # super().save(*args, **kwargs)
 
     def __str__(self):
         return self.email
@@ -95,3 +107,6 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+    
+    
+

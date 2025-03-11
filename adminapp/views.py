@@ -3,12 +3,17 @@ from django.contrib import messages, auth
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Account
-from .forms import RegistrationForms,LoginForm
+from .forms import RegistrationForms,LoginForm,UserProfileForm
 import random
 from django.contrib.auth import logout,authenticate
 from .forms import LoginForm
 from django.contrib.auth.decorators import login_required
 from.decorators import allowed_roles
+from django.contrib.auth import get_user_model
+
+
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 
 
 def generate_otp():
@@ -34,7 +39,29 @@ def register(request):
             while Account.objects.filter(username=unique_username).exists():
                 unique_username = f"{base_username}{counter}"
                 counter += 1
-
+                
+            if len(password) < 8:
+                messages.error(request, "Password must be at least 8 characters long.")  # Added password length validation
+                return redirect('register')    
+                
+            user_details = [first_name.lower(), last_name.lower(), email.split('@')[0].lower()]
+            if any(detail in password.lower() for detail in user_details):
+                messages.error(request, "Password should not contain your name, email, or username.")  # Prevents user info in password
+                return redirect('register')
+                            
+            try:
+                validate_password(password)  # Uses Django's built-in password validation for better security
+            except ValidationError as e:
+                messages.error(request, " ".join(e.messages))
+                return redirect('register')
+            
+        
+            common_passwords = ["password", "12345678", "qwerty123", "admin123", "welcome123"]
+            if password.lower() in common_passwords:
+                messages.error(request, "Password is too common. Please choose a stronger password.")  #Prevents common weak passwords
+                return redirect('register')  
+            
+                      
             otp = generate_otp()
 
             user = Account.objects.create_user(
@@ -133,6 +160,8 @@ def login(request):
                     return redirect('student_dashboard')
                 elif user.roles == 'Parent':
                     return redirect('parent_dashboard')  
+                elif user.roles == 'guest':
+                    return redirect('')
                 else:
                     return redirect('home')    
             else:
@@ -162,7 +191,7 @@ def teacher_dashboard(request):
     return render(request, 'dashboard/teacher_dashboard.html')
 
 def student_dashboard(request):
-    return render(request, 'dashboard/student_dashboard.html')
+    return render(request, 'student/student_dashboard.html')
 
 def parent_dashboard(request):
     return render(request, 'dashboard/parent_dashboard.html')
@@ -177,3 +206,63 @@ def all_users_list(request):
 
 def roles(request):
     return render(request,'adminapp/roles_form.html')
+
+
+User = get_user_model()
+def search_and_select(request):
+    
+    keyword = request.GET.get('keyword', '').strip()
+    user = None
+    
+    if keyword:
+        try:
+            user = Account.objects.get(user_key=keyword)
+        except Account.DoesNotExist:
+            user = None
+    return render(request, 'adminapp/roles_form.html',{"user":user})
+
+
+@login_required
+def profile_view(request):
+    if request.method == 'POST':
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+        if profile_form.is_valid():
+            profile_form.save()
+            
+            if request.user.roles == 'admin':
+                return redirect('admin_profile')  # Replace with the correct URL name for admin
+            elif request.user.roles == 'student':
+                # print("Profile updated successfully")
+                return redirect('student_profile')  # Replace with the correct URL name for student
+            elif request.user.roles == 'Teacher':
+                return redirect('Teacher_profile')  # Replace with the correct URL name for instructor
+            elif request.user.roles == 'guest':
+                return redirect('guest_profile')
+            elif request.user.roles == 'parant':
+                return redirect('parant_profile')
+        else:
+            print("Form is not valid:", profile_form.errors)
+    else:
+        profile_form = UserProfileForm(instance=request.user)
+
+    # Render a template based on the role
+    if request.user.roles == 'admin':
+        template_name = 'adminapp/admin_profile.html'
+    elif request.user.roles == 'student':
+        template_name = 'student/student_profile.html'
+    elif request.user.roles == 'teacher':
+        template_name = 'teacher/teacher_profile.html'
+    elif request.user.roles == 'guest':
+        template_name = 'guest/guest_profile.html'
+    elif request.user.roles == 'parant':
+        template_name = 'parant/parant_profile.html'
+    else:
+        template_name = 'admin/admin_profile.html'  # Fallback template for undefined roles
+
+    context = {
+        'profile_form': profile_form,
+    }
+    return render(request, template_name, context)
+
+
+

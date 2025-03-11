@@ -17,8 +17,18 @@ urlpatterns = [
     
     
     
-    path('all_users_list', views.all_users_list, name='all_users_list'),
-    path('roles', views.roles, name='roles'),
+    path('all_users_list/', views.all_users_list, name='all_users_list'),
+    path('roles/', views.roles, name='roles'),
+    path('search_and_select/', views.search_and_select, name='search_and_select'),
+    
+    
+    #profiles
+    path('profile_view/', views.profile_view, name='profile_view'),
+    path('profile_view/', views.profile_view, name='admin_profile'),
+    path('student_profile/', views.profile_view, name='student_profile'),
+    path('Teacher_profile/', views.profile_view, name='Teacher_profile'),
+    path('guest_profile/', views.profile_view, name='guest_profile'),
+    path('parant_profile/',views.profile_view,name='parant_profile')
     
 ]
 
