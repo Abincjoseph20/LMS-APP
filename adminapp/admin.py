@@ -8,3 +8,4 @@ class AccountAdmin(admin.ModelAdmin):
     readonly_fields = ('user_key',)  
 
 admin.site.register(Account, AccountAdmin) 
+# admin.site.register(Students)

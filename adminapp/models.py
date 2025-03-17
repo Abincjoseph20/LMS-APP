@@ -82,23 +82,7 @@ class Account(AbstractBaseUser):
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     objects = MyAccountManager()
-    
-    # def save(self, *args, **kwargs):
-    #     if not self.user_key:
-    #         self.user_key = Account.objects.generate_unique_alphanumeric_key()
-    #         #self.user_key = MyAccountManager().generate_unique_alphanumeric_key()  # Correcte
-    #         #self.user_key = self.__class__.objects.generate_unique_alphanumeric_key() 
-    #     super().save(*args, **kwargs)
-    
-    def save(self, *args, **kwargs):
-        if not self.user_key:
-            self.user_key = Account.objects.generate_unique_alphanumeric_key()
-        super().save(*args, **kwargs)
         
-        
-        #     self.user_key = self.__class__.objects.generate_unique_alphanumeric_key()  # Corrected
-        # super().save(*args, **kwargs)
-
     def __str__(self):
         return self.email
 
@@ -107,6 +91,3 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
-    
-    
-
