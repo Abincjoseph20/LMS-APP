@@ -14,7 +14,7 @@ from django.contrib.auth import get_user_model
 
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
-
+import json 
 
 def generate_otp():
     return str(random.randint(100000, 999999))  # 6-digit OTP
@@ -45,6 +45,7 @@ def register(request):
                 return redirect('register')    
                 
             user_details = [first_name.lower(), last_name.lower(), email.split('@')[0].lower()]
+            
             if any(detail in password.lower() for detail in user_details):
                 messages.error(request, "Password should not contain your name, email, or username.")  # Prevents user info in password
                 return redirect('register')
@@ -63,18 +64,16 @@ def register(request):
             
                       
             otp = generate_otp()
-
-            user = Account.objects.create_user(
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                username=unique_username,
-                password=password,
-                otp=otp,
-                roles=role 
-            )
-            user.is_active = False  # user remains inactive until OTP verification
-            user.save()
+            
+            request.session['user_data'] = json.dumps({
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'username': unique_username,
+                'password': password,
+                'otp': otp,
+                'roles': role
+            })
 
             # Send OTP to user's email
             try:
@@ -106,29 +105,43 @@ def verify_otp(request):
         otp_entered = request.POST.get('otp', '').strip()  
         
         try:
-            user = Account.objects.get(email=email)
-            print(f"Stored OTP in DB: {user.otp}")  # Debugging line
-            print(f"User entered OTP: {otp_entered}")  # Debugging line
+            user_data = json.loads(request.session.get('user_data', '{}'))
             
-            
-            if not user.otp:  # New Comment: Ensure OTP is not expired before checking
-                messages.error(request, 'OTP expired or not generated. Please register again.')
+            if not user_data or user_data.get('email') != email:
+                messages.error(request, 'Invalid session. Please register again.')
                 return redirect('register')
             
-            if user.otp == otp_entered:
+            stored_otp = user_data.get('otp')
+            
+            if stored_otp == otp_entered:
+
+                user = Account.objects.create_user(
+                    first_name=user_data['first_name'],
+                    last_name=user_data['last_name'],
+                    email=user_data['email'],
+                    username=user_data['username'],
+                    password=user_data['password'],
+                    otp=None,  # Clear OTP
+                    roles=user_data['roles']
+                )
                 user.is_active = True
                 user.is_verified = True
-                user.otp = None
                 user.save()
+                
+                # Clear session data after saving
+                del request.session['user_data']
+                del request.session['email']
+                
                 messages.success(request, 'Account verified successfully! Please log in.')
                 return redirect('login')
+            
                 # return redirect('registration_success')
             else:
                 messages.error(request, 'Invalid OTP. Try again.')
                 print('Invalid OTP. Try again.')
-        except Account.DoesNotExist:
-            messages.error(request, 'User not found.')
-            print('User not found')
+        except Exception as e:
+            messages.error(request, f'Error: {str(e)}')
+            return redirect('register')
 
     return render(request, 'registration/verify_otp.html')
 

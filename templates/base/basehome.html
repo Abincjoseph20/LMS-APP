@@ -124,11 +124,11 @@
                             <div class="button float-left">
                                 {% if user.is_authenticated %}
                                     {% if user.is_superuser %}
-                                        <a href="#" class="main-btn">Admin Dashboard</a>
+                                        <a href="{% url 'admin_dashboard' %}" class="main-btn">Admin Dashboard</a>
                                     {% elif user.role == 'instructor' %}
-                                        <a href="#" class="main-btn">Instructor Dashboard</a>
+                                        <a href="{% url 'lecture_dashboard' %}" class="main-btn">Instructor Dashboard</a>
                                     {% elif user.role == 'student' %}
-                                        <a href="#" class="main-btn">Profile</a>
+                                        <a href="{% url 'student_dashboard' %}" class="main-btn">Profile</a>
                                     {% endif %}
                                 {% endif %}
                             </div>
@@ -152,7 +152,7 @@
                             <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
                                 <ul class="navbar-nav mr-auto">
                                     <li class="nav-item">
-                                        <a class="active" href="#">Home</a>
+                                        <a class="active" href="3">Home</a>
                                        
                                     </li>
                                     <li class="nav-item">
@@ -164,7 +164,7 @@
                                         <ul class="sub-menu">
                                             {% for cat in category %}
                                             <li>
-                                                <a href="#">{{ cat.name }}</a> <!-- Category name -->
+                                                <a href="{% url 'course_filter' cat.id %}">{{ cat.name }}</a> <!-- Category name -->
                                                 
                                             </li>
                                             {% endfor %}
@@ -206,8 +206,9 @@
                                 {% if user.is_authenticated %}
                                 
                                 <li class="nav-item dropdown border-0 px-1 px-md-3 ms-2">
-                                    <a class="nav-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" href="#" aria-expanded="false">
-                                       Hi {{ user.username }} {{user.user_key}}
+                                    <a class="nav-link dropdown-toggle" id="userDropdown" 
+                                    data-bs-toggle="dropdown" href="#" aria-expanded="false">
+                                       Hi {{ user.username }}
                                     </a> 
                                     <ul class="dropdown-menu border-xl shadow-none" aria-labelledby="userDropdown">
                                         <li>
@@ -236,6 +237,7 @@
                                     <a href="{% url 'login' %}" class="main-btn">Login</a>
                                 </div>
                                 {% endif %}
+                
                             </ul>
                         </div> 
                     </div>
@@ -407,10 +409,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
 </body>
 </html>
