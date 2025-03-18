@@ -3,330 +3,282 @@
 
 {% block content %}
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Add padding to the body to avoid overlapping with the navbar */
         body {
-            padding-top: 80px; /* Adjust this value based on your navbar height */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
-            background-color: #ffffff;
+            background-color: #f5f7fa;
+            margin: 0;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .search-container {
+        .button-container {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 20px;
         }
 
-        .search-container .form-control {
-            flex: 1;
-        }
-
-        .search-wrapper {
-            display: flex;
-            flex: 1;
-            gap: 5px;
-        }
-
-        .search-btn {
-            padding: 10px 20px;
-            background-color:  #696cff;
+        .action-btn {
+            background-color: #7dd3f7;
             color: white;
             border: none;
             border-radius: 4px;
-            cursor: pointer;
+            padding: 8px 15px;
             font-size: 14px;
-        }
-
-        .search-btn:hover {
-            background-color:  #696cff;
-        }
-
-        .nav-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            list-style: none;
-        }
-
-        .nav-item {
-            padding: 10px 20px;
-            margin-right: 5px;
             cursor: pointer;
-            border-radius: 4px;
-            font-size: 14px;
-            border: none;
-            background-color: transparent;
-            color:   #696cff;
+            text-align: center;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background-color 0.3s ease;
         }
 
-        .nav-item.active {
-            background-color: #696cff;
-            color: white;
+        .action-btn:hover {
+            background-color: #5fc1eb;
         }
 
-        .section-title {
+        .action-label {
             font-size: 18px;
-            margin-bottom: 20px;
-            font-weight: bold;
+            font-weight: 500;
+            margin: 20px 0 10px 0;
+            color: #444;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table th, table td {
-            padding: 12px 15px;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        table tr:nth-child(odd) {
-            background-color: #f2f2f2;
-        }
-
-        .checkbox-container {
+        .controls {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
         }
 
-        input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-        }
-
-        .module-column {
-            width: 30%;
-        }
-
-        .permission-column {
-            width: 70%;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .permission-item {
-            flex: 1;
+        .edit-btn {
+            background-color: #5ebdce;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            cursor: pointer;
         }
 
-        .submit-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color:  #696cff;
+        .delete-btn {
+            background-color: #ff5b8d;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            font-size: 14px;
         }
 
-        .submit-btn:hover {
-            background-color: #696cff;
+        /* SVG icons */
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: white;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Table / </span>Users Roles</h4>
-
-        <!-- Search & Select Fields -->
-        <div class="search-container">
-            <!-- Search and Select Role Dropdown -->
-            <select id="role-dropdown" class="form-control">
-                <option value="">Search and select role</option>
-                {% if user %}
-                    <option value="{{user.id}}" selected>{{user.first_name}} {{user.last_name}}</option>
-                {% endif %}
-            </select>
-
-            <!-- Select Role Type Dropdown -->
-            <select id="role-type" class="form-control">
-                <option value="">Select Role Type</option>
-                <option value="admin" {% if user.roles == 'admin' %}selected{% endif %}>Admin</option>
-                <option value="student" {% if user.roles == 'student' %}selected{% endif %}>Student</option>
-                <option value="Teacher" {% if user.roles == 'Teacher' %}selected{% endif %}>Teacher</option>
-                <option value="Parent" {% if user.roles == 'Parent' %}selected{% endif %}>Parent</option> 
-                <option value="guest" {% if user.roles == 'guest' %}selected{% endif %}>Guest</option>
-            </select>
-
-            <!-- Search Form -->
-            <form method="GET" action="{% url 'search_and_select' %}" class="search-wrapper">
-                <input type="text" id="role-search" name="keyword" value="{{ request.GET.keyword }}" class="form-control" placeholder="Search by user key">
-                <button type="submit" class="search-btn">Search</button>
-            </form>
-        </div>
-
-        <!-- Navigation Tabs -->
-        <div class="nav-tabs">
-            <button class="nav-item" data-role="admin" data-tab="staff">Admin</button>
-            <button class="nav-item" data-role="student" data-tab="crm">Student</button>
-            <button class="nav-item" data-role="teacher" data-tab="project">Teacher</button>
-            <button class="nav-item" data-role="guest" data-tab="hrm">Guest</button>
-            <button class="nav-item" data-role="parent" data-tab="account">Parent</button>
-        </div>
-
-
-        <!-- Section Title -->
-        <h2 class="section-title">Assign General Permission to Student</h2>
-
-        <!-- Form for Permission Assignment -->
-        <form method="POST" action="#">
-
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 5%;">
-                            <input type="checkbox" id="select-all">
-                        </th>
-                        <th style="width: 25%;">MODULE</th>
-                        <th style="width: 70%;">PERMISSIONS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="checkbox-container">
-                            <input type="checkbox" class="module-checkbox" name="module" value="profile">
-                        </td>
-                        <td>Profile</td>
-                        <td class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox" class="permission-checkbox" name="profile_permissions" value="manage"> <label>Manage</label>
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox" class="permission-checkbox" name="profile_permissions" value="create"> <label>Create</label>
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox" class="permission-checkbox" name="profile_permissions" value="edit"> <label>Edit</label>
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox" class="permission-checkbox" name="profile_permissions" value="delete"> <label>Delete</label>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="checkbox-container">
-                            <input type="checkbox" class="module-checkbox" name="module" value="admin">
-                        </td>
-                        <td>Student</td>
-                        <td class="permission-column">
-                            <div class="permission-item">
-                                <input type="checkbox" class="permission-checkbox" name="admin_permissions" value="manage"> <label>Manage</label>
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox" class="permission-checkbox" name="admin_permissions" value="create"> <label>Create</label>
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox" class="permission-checkbox" name="admin_permissions" value="edit"> <label>Edit</label>
-                            </div>
-                            <div class="permission-item">
-                                <input type="checkbox" class="permission-checkbox" name="admin_permissions" value="delete"> <label>Delete</label>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <!-- Submit Button -->
-            <button type="submit" class="submit-btn">Assign Permissions</button>
-        </form>
-
+    <div class="button-container">
+        <a href="#" class="action-btn">show account dashboard</a>
+        <a href="#" class="action-btn">manage print settings</a>
+        <a href="#" class="action-btn">manage expense</a>
+        <a href="#" class="action-btn">create expense</a>
+        <a href="#" class="action-btn">edit expense</a>
+        <a href="#" class="action-btn">delete expense</a>
+        <a href="#" class="action-btn">manage invoice</a>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Handle tab switching based on user role
-            const buttons = document.querySelectorAll('.nav-item');
-            const userRole = "{{ user.roles|lower }}"; // Get user role from Django and convert to lowercase
+    <div class="button-container">
+        <a href="#" class="action-btn">create invoice</a>
+        <a href="#" class="action-btn">edit invoice</a>
+        <a href="#" class="action-btn">delete invoice</a>
+        <a href="#" class="action-btn">show invoice</a>
+        <a href="#" class="action-btn">create payment invoice</a>
+        <a href="#" class="action-btn">delete payment invoice</a>
+        <a href="#" class="action-btn">send invoice</a>
+    </div>
 
-            // Set active class based on user role
-            buttons.forEach(button => {
-                if (button.dataset.role === userRole) {
-                    buttons.forEach(btn => btn.classList.remove('active')); // Remove active from all
-                    button.classList.add('active'); // Add active to matched role
-                }
-            });
+    <div class="button-container">
+        <a href="#" class="action-btn">delete invoice product</a>
+        <a href="#" class="action-btn">convert invoice</a>
+        <a href="#" class="action-btn">manage constant unit</a>
+        <a href="#" class="action-btn">create constant unit</a>
+        <a href="#" class="action-btn">edit constant unit</a>
+        <a href="#" class="action-btn">delete constant unit</a>
+    </div>
 
-            // Handle manual tab switching when clicking buttons
-            buttons.forEach(button => {
-                button.addEventListener('click', () => {
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                });
-            });
+    <div class="button-container">
+        <a href="#" class="action-btn">manage constant tax</a>
+        <a href="#" class="action-btn">create constant tax</a>
+        <a href="#" class="action-btn">edit constant tax</a>
+        <a href="#" class="action-btn">delete constant tax</a>
+        <a href="#" class="action-btn">manage constant category</a>
+        <a href="#" class="action-btn">create constant category</a>
+    </div>
 
-            // Handle "Select All" checkbox functionality
-            const selectAllCheckbox = document.getElementById('select-all');
-            const moduleCheckboxes = document.querySelectorAll('.module-checkbox');
+    <div class="button-container">
+        <a href="#" class="action-btn">edit constant category</a>
+        <a href="#" class="action-btn">delete constant category</a>
+        <a href="#" class="action-btn">manage product & service</a>
+        <a href="#" class="action-btn">create product & service</a>
+        <a href="#" class="action-btn">edit product & service</a>
+    </div>
 
-            if (selectAllCheckbox) {
-                selectAllCheckbox.addEventListener('change', function () {
-                    moduleCheckboxes.forEach(moduleCheckbox => {
-                        moduleCheckbox.checked = this.checked;
-                        togglePermissions(moduleCheckbox);
-                    });
-                });
-            }
+    <div class="button-container">
+        <a href="#" class="action-btn">delete product & service</a>
+        <a href="#" class="action-btn">manage customer</a>
+        <a href="#" class="action-btn">create customer</a>
+        <a href="#" class="action-btn">edit customer</a>
+        <a href="#" class="action-btn">delete customer</a>
+        <a href="#" class="action-btn">show customer</a>
+        <a href="#" class="action-btn">manage vender</a>
+    </div>
 
-            // Handle individual module checkbox clicks
-            moduleCheckboxes.forEach(moduleCheckbox => {
-                moduleCheckbox.addEventListener('change', function () {
-                    togglePermissions(this);
-                    updateSelectAllCheckbox();
-                });
-            });
+    <div class="button-container">
+        <a href="#" class="action-btn">create vender</a>
+        <a href="#" class="action-btn">edit vender</a>
+        <a href="#" class="action-btn">delete vender</a>
+        <a href="#" class="action-btn">show vender</a>
+        <a href="#" class="action-btn">manage bank account</a>
+        <a href="#" class="action-btn">create bank account</a>
+        <a href="#" class="action-btn">edit bank account</a>
+    </div>
 
-            // Function to toggle permissions when module checkbox is clicked
-            function togglePermissions(moduleCheckbox) {
-                const row = moduleCheckbox.closest('tr');
-                if (row) {
-                    const permissions = row.querySelectorAll('.permission-checkbox');
-                    permissions.forEach(permission => {
-                        permission.checked = moduleCheckbox.checked;
-                    });
-                }
-            }
+    <div class="button-container">
+        <a href="#" class="action-btn">delete bank account</a>
+        <a href="#" class="action-btn">manage bank transfer</a>
+        <a href="#" class="action-btn">create bank transfer</a>
+        <a href="#" class="action-btn">edit bank transfer</a>
+        <a href="#" class="action-btn">delete bank transfer</a>
+        <a href="#" class="action-btn">manage transaction</a>
+    </div>
 
-            // Update "Select All" checkbox state based on module checkboxes
-            function updateSelectAllCheckbox() {
-                const allChecked = Array.from(moduleCheckboxes).every(checkbox => checkbox.checked);
-                selectAllCheckbox.checked = allChecked;
-            }
-        });
-    </script>
+    <div class="button-container">
+        <a href="#" class="action-btn">manage revenue</a>
+        <a href="#" class="action-btn">create revenue</a>
+        <a href="#" class="action-btn">edit revenue</a>
+        <a href="#" class="action-btn">delete revenue</a>
+        <a href="#" class="action-btn">manage bill</a>
+        <a href="#" class="action-btn">create bill</a>
+        <a href="#" class="action-btn">edit bill</a>
+        <a href="#" class="action-btn">delete bill</a>
+    </div>
+
+    <div class="button-container">
+        <a href="#" class="action-btn">show bill</a>
+        <a href="#" class="action-btn">manage payment</a>
+        <a href="#" class="action-btn">create payment</a>
+        <a href="#" class="action-btn">edit payment</a>
+        <a href="#" class="action-btn">delete payment</a>
+        <a href="#" class="action-btn">delete bill product</a>
+        <a href="#" class="action-btn">send bill</a>
+    </div>
+
+    <div class="action-label">accountant</div>
+
+    <div class="button-container">
+        <a href="#" class="action-btn">create payment bill</a>
+        <a href="#" class="action-btn">delete payment bill</a>
+        <a href="#" class="action-btn">income report</a>
+        <a href="#" class="action-btn">expense report</a>
+        <a href="#" class="action-btn">income vs expense report</a>
+        <a href="#" class="action-btn">invoice report</a>
+        <a href="#" class="action-btn">bill report</a>
+    </div>
+
+    <div class="button-container">
+        <a href="#" class="action-btn">stock report</a>
+        <a href="#" class="action-btn">tax report</a>
+        <a href="#" class="action-btn">loss & profit report</a>
+        <a href="#" class="action-btn">manage credit note</a>
+        <a href="#" class="action-btn">create credit note</a>
+        <a href="#" class="action-btn">edit credit note</a>
+        <a href="#" class="action-btn">delete credit note</a>
+    </div>
+
+    <div class="button-container">
+        <a href="#" class="action-btn">manage debit note</a>
+        <a href="#" class="action-btn">create debit note</a>
+        <a href="#" class="action-btn">edit debit note</a>
+        <a href="#" class="action-btn">delete debit note</a>
+        <a href="#" class="action-btn">manage proposal</a>
+        <a href="#" class="action-btn">create proposal</a>
+        <a href="#" class="action-btn">edit proposal</a>
+    </div>
+
+    <div class="button-container">
+        <a href="#" class="action-btn">delete proposal</a>
+        <a href="#" class="action-btn">duplicate proposal</a>
+        <a href="#" class="action-btn">show proposal</a>
+        <a href="#" class="action-btn">send proposal</a>
+        <a href="#" class="action-btn">delete proposal product</a>
+        <a href="#" class="action-btn">manage goal</a>
+        <a href="#" class="action-btn">create goal</a>
+    </div>
+
+    <div class="button-container">
+        <a href="#" class="action-btn">edit goal</a>
+        <a href="#" class="action-btn">delete goal</a>
+        <a href="#" class="action-btn">manage assets</a>
+        <a href="#" class="action-btn">create assets</a>
+        <a href="#" class="action-btn">edit assets</a>
+        <a href="#" class="action-btn">delete assets</a>
+        <a href="#" class="action-btn">statement report</a>
+    </div>
+
+    <div class="button-container">
+        <a href="#" class="action-btn">manage constant custom field</a>
+        <a href="#" class="action-btn">create constant custom field</a>
+        <a href="#" class="action-btn">edit constant custom field</a>
+        <a href="#" class="action-btn">delete constant custom field</a>
+        <a href="#" class="action-btn">manage chart of account</a>
+    </div>
+
+    <div class="button-container">
+        <a href="#" class="action-btn">create chart of account</a>
+        <a href="#" class="action-btn">edit chart of account</a>
+        <a href="#" class="action-btn">delete chart of account</a>
+        <a href="#" class="action-btn">manage journal entry</a>
+        <a href="#" class="action-btn">create journal entry</a>
+        <a href="#" class="action-btn">edit journal entry</a>
+    </div>
+
+    <div class="button-container">
+        <a href="#" class="action-btn">delete journal entry</a>
+        <a href="#" class="action-btn">show journal entry</a>
+        <a href="#" class="action-btn">balance sheet report</a>
+        <a href="#" class="action-btn">ledger report</a>
+        <a href="#" class="action-btn">trial balance report</a>
+        <a href="#" class="action-btn">create budget plan</a>
+    </div>
+
+    <div class="button-container">
+        <a href="#" class="action-btn">edit budget plan</a>
+        <a href="#" class="action-btn">manage budget plan</a>
+        <a href="#" class="action-btn">delete budget plan</a>
+        <a href="#" class="action-btn">view budget plan</a>
+        <a href="#" class="action-btn">create barcode</a>
+        <a href="#" class="action-btn">create webhook</a>
+        <a href="#" class="action-btn">edit webhook</a>
+    </div>
+
+    <div class="controls">
+        <button class="edit-btn">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+        </button>
+        <button class="delete-btn">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+        </button>
+    </div>
 </body>
-
-
-{% endblock %}
+{% endblock content %}

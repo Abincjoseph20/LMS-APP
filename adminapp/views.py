@@ -104,10 +104,16 @@ def verify_otp(request):
 
     if request.method == 'POST':
         otp_entered = request.POST.get('otp', '').strip()  
+        
         try:
             user = Account.objects.get(email=email)
             print(f"Stored OTP in DB: {user.otp}")  # Debugging line
             print(f"User entered OTP: {otp_entered}")  # Debugging line
+            
+            
+            if not user.otp:  # New Comment: Ensure OTP is not expired before checking
+                messages.error(request, 'OTP expired or not generated. Please register again.')
+                return redirect('register')
             
             if user.otp == otp_entered:
                 user.is_active = True
