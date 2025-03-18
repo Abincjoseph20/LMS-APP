@@ -55,12 +55,15 @@
 
             <!-- Display Messages -->
             
-            <form class="p-4 p-md-5 border rounded-3 shadow bg-white" method="post" action="{% url 'register' %}">
+            <form class="p-4 p-md-5 border rounded-3 shadow bg-white"
+             method="post"
+             action="{% url 'register' %}">
                 {% csrf_token %}
             
                 <!-- First Name Field -->
                 <div class="form-group mb-4">
-                    <label for="{{ form.first_name.id_for_label }}" class="form-label fw-semibold text-dark">First Name</label>
+                    <label for="{{ form.first_name.id_for_label }}"
+                    class="form-label fw-semibold text-dark">First Name</label>
                     {{ form.first_name }}
                     {% if form.first_name.errors %}
                         <div class="text-danger">{{ form.first_name.errors.0 }}</div>
@@ -69,7 +72,8 @@
             
                 <!-- Last Name Field -->
                 <div class="form-group mb-4">
-                    <label for="{{ form.last_name.id_for_label }}" class="form-label fw-semibold text-dark">Last Name</label>
+                    <label for="{{ form.last_name.id_for_label }}" 
+                    class="form-label fw-semibold text-dark">Last Name</label>
                     {{ form.last_name }}
                     {% if form.last_name.errors %}
                         <div class="text-danger">{{ form.last_name.errors.0 }}</div>
@@ -78,7 +82,8 @@
             
                 <!-- Email Field -->
                 <div class="form-group mb-4">
-                    <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold text-dark">Email</label>
+                    <label for="{{ form.email.id_for_label }}" 
+                    class="form-label fw-semibold text-dark">Email</label>
                     {{ form.email }}
                     {% if form.email.errors %}
                         <div class="text-danger">{{ form.email.errors.0 }}</div>
@@ -87,7 +92,8 @@
             
                 <!-- Password Field -->
                 <div class="form-group mb-4">
-                    <label for="{{ form.password.id_for_label }}" class="form-label fw-semibold text-dark">Password</label>
+                    <label for="{{ form.password.id_for_label }}" 
+                    class="form-label fw-semibold text-dark">Password</label>
                     {{ form.password }}
                     {% if form.password.errors %}
                         <div class="text-danger">{{ form.password.errors.0 }}</div>
@@ -96,7 +102,8 @@
             
                 <!-- Confirm Password Field -->
                 <div class="form-group mb-4">
-                    <label for="{{ form.confirm_password.id_for_label }}" class="form-label fw-semibold text-dark">Confirm Password</label>
+                    <label for="{{ form.confirm_password.id_for_label }}" 
+                    class="form-label fw-semibold text-dark">Confirm Password</label>
                     {{ form.confirm_password }}
                     {% if form.confirm_password.errors %}
                         <div class="text-danger">{{ form.confirm_password.errors.0 }}</div>
@@ -104,7 +111,8 @@
                 </div>
             
                 <div class="form-group mb-4">
-                    <label for="{{ form.roles.id_for_label }}" class="form-label fw-semibold text-dark">Select Role</label>
+                    <label for="{{ form.roles.id_for_label }}"
+                    class="form-label fw-semibold text-dark">Select Role</label>
                     {{ form.roles }}
                     {% if form.roles.errors %}
                         <div class="text-danger">{{ form.roles.errors.0 }}</div>
@@ -112,7 +120,8 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button class="btn btn-lg btn-primary w-100 mt-3 shadow-sm" type="submit">Sign Up</button>
+                <button class="btn btn-lg btn-primary w-100 mt-3 shadow-sm" 
+                type="submit">Sign Up</button>
             </form>
             <p class="text-center mt-4 mb-0">
                 Already have an account?

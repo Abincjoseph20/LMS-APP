@@ -28,7 +28,10 @@ urlpatterns = [
     path('student_profile/', views.profile_view, name='student_profile'),
     path('Teacher_profile/', views.profile_view, name='Teacher_profile'),
     path('guest_profile/', views.profile_view, name='guest_profile'),
-    path('parant_profile/',views.profile_view,name='parant_profile')
+    path('parant_profile/',views.profile_view,name='parant_profile'),
+    
+    
+    # path('admin_register/', views.register, {'admin': 'true'}, name='admin_register'), 
     
 ]
 
