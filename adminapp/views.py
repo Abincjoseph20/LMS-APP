@@ -336,3 +336,6 @@ def admin_register(request):
         return redirect('admin_login')
 
     return render(request, 'admin_registration.html')
+
+
+
