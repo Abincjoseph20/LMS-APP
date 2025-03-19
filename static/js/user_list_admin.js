@@ -209,3 +209,74 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+// To handle the form submission and modal behavior.
+
+// document.addEventListener("DOMContentLoaded", function () {
+
+//     // Edit user data in the modal
+//     document.querySelectorAll(".edit-user").forEach(btn => {
+//         btn.addEventListener("click", function () {
+//             const userId = this.getAttribute("data-id");
+//             const username = this.getAttribute("data-username");
+//             const email = this.getAttribute("data-email");
+//             const role = this.getAttribute("data-role");
+//             const status = this.getAttribute("data-status");
+
+//             document.getElementById("userId").value = userId;
+//             document.getElementById("username").value = username;
+//             document.getElementById("email").value = email;
+//             document.getElementById("role").value = role;
+//             document.getElementById("status").value = status === "true" ? "true" : "false";
+            
+//             if (role === "instructor") {
+//                 document.getElementById("instructorFields").style.display = "block";
+//             } else {
+//                 document.getElementById("instructorFields").style.display = "none";
+//             }
+//         });
+//     });
+
+//     // Reset modal form on close
+//     document.getElementById("userModal").addEventListener("hidden.bs.modal", function () {
+//         document.getElementById("userForm").reset();
+//         document.getElementById("instructorFields").style.display = "none";
+//     });
+
+// });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('userForm');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                
+                // Handle success
+                if (result.success) {
+                    alert('User registered successfully!');
+                    window.location.reload();  // Refresh the page
+                } else {
+                    alert(`Error: ${result.message}`);
+                }
+            } else {
+                console.error('Failed:', response.statusText);
+                alert('An error occurred while submitting the form.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while submitting the form.');
+        }
+    });
+});

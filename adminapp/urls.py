@@ -31,7 +31,7 @@ urlpatterns = [
     path('parant_profile/',views.profile_view,name='parant_profile'),
     
     
-    # path('admin_register/', views.register, {'admin': 'true'}, name='admin_register'), 
+    path('admin_register/', views.admin_register, name='admin_register'), 
     
 ]
 

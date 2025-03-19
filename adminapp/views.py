@@ -11,93 +11,19 @@ from django.contrib.auth.decorators import login_required
 from.decorators import allowed_roles
 from django.contrib.auth import get_user_model
 
+
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
 import json 
 
+from django.contrib import messages
+from .models import Account
+from .forms import AdminUserForm
+
 def generate_otp():
     return str(random.randint(100000, 999999))  # 6-digit OTP
 
-
-
-# def register(request):
-#     if request.method == 'POST':
-#         form = RegistrationForms(request.POST)
-#         if form.is_valid():
-#             first_name = form.cleaned_data['first_name']  
-#             last_name = form.cleaned_data['last_name']    
-#             email = form.cleaned_data['email']
-#             role = form.cleaned_data['roles']
-#             print(email)
-#             password = form.cleaned_data['password']
-#             print(password)
-#             username = email.split('@')[0]
-            
-#             # Ensure username is unique
-#             base_username = username.lower()
-#             unique_username = base_username
-#             counter = 1
-#             while Account.objects.filter(username=unique_username).exists():
-#                 unique_username = f"{base_username}{counter}"
-#                 counter += 1
-                
-#             if len(password) < 8:
-#                 messages.error(request, "Password must be at least 8 characters long.")  # Added password length validation
-#                 return redirect('register')    
-                
-#             user_details = [first_name.lower(), last_name.lower(), email.split('@')[0].lower()]
-            
-#             if any(detail in password.lower() for detail in user_details):
-#                 messages.error(request, "Password should not contain your name, email, or username.")  # Prevents user info in password
-#                 return redirect('register')
-                            
-#             try:
-#                 validate_password(password)  # Uses Django's built-in password validation for better security
-#             except ValidationError as e:
-#                 messages.error(request, " ".join(e.messages))
-#                 return redirect('register')
-            
-        
-#             common_passwords = ["password", "12345678", "qwerty123", "admin123", "welcome123"]
-#             if password.lower() in common_passwords:
-#                 messages.error(request, "Password is too common. Please choose a stronger password.")  #Prevents common weak passwords
-#                 return redirect('register')  
-            
-                      
-#             otp = generate_otp()
-            
-#             request.session['user_data'] = json.dumps({
-#                 'first_name': first_name,
-#                 'last_name': last_name,
-#                 'email': email,
-#                 'username': unique_username,
-#                 'password': password,
-#                 'otp': otp,
-#                 'roles': role
-#             })
-
-#             # Send OTP to user's email
-#             try:
-#                 send_mail(
-#                     subject="Your OTP Verification Code",
-#                     message=f"Your OTP for account activation is {otp}.",
-#                     from_email=settings.EMAIL_HOST_USER,
-#                     recipient_list=[email],
-#                     fail_silently=False,
-#                 )
-#                 messages.success(request, 'OTP sent to your email. Verify your account.')
-#             except Exception as e:
-#                 messages.error(request, f'Error sending OTP: {e}')
-#                 return redirect('register')
-#             request.session['email'] = email
-#             return redirect('verify_otp')
-#     else:
-#         form = RegistrationForms()
-#     return render(request, 'registration/register.html', {'form': form})
-
 def register(request):
-    is_admin = request.GET.get('admin') == 'true' 
-    
     if request.method == 'POST':
         form = RegistrationForms(request.POST)
         if form.is_valid():
@@ -143,39 +69,15 @@ def register(request):
                       
             otp = generate_otp()
             
-            if is_admin:
-                # Admin-side registration: directly create and activate the account
-                user = Account.objects.create_user(
-                    first_name=first_name,
-                    last_name=last_name,
-                    email=email,
-                    username=unique_username,
-                    password=password,
-                    otp=None,
-                    roles=role
-                )
-                user.is_active = True
-                user.is_verified = True
-
-                if role == 'admin':
-                    user.is_admin = True
-                    user.is_staff = True
-                    user.is_superadmin = True
-
-                user.save()
-                messages.success(request, 'Admin account created successfully.')
-                return redirect('admin_dashboard')  # Redirect to admin dashboard
-
-            else:
-                request.session['user_data'] = json.dumps({
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'email': email,
-                    'username': unique_username,
-                    'password': password,
-                    'otp': otp,
-                    'roles': role
-                })
+            request.session['user_data'] = json.dumps({
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'username': unique_username,
+                'password': password,
+                'otp': otp,
+                'roles': role
+            })
 
             # Send OTP to user's email
             try:
@@ -386,4 +288,51 @@ def profile_view(request):
     return render(request, template_name, context)
 
 
+#---------------------------------------
 
+def admin_register(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+        phone_number = request.POST.get('phone_number')  # Added phone number
+        address = request.POST.get('address')            # Added address
+        role = request.POST.get('role')    
+
+        # Error handling
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match')
+            return redirect('admin_registration')
+
+        if Account.objects.filter(email=email).exists():
+            messages.error(request, 'Email is already taken')
+            return redirect('admin_registration')
+
+        if Account.objects.filter(username=username).exists():
+            messages.error(request, 'Username is already taken')
+            return redirect('admin_registration')
+        
+        # Admin status handling
+        is_admin = True if role == 'admin' else False
+
+        # Creating Admin User
+        user = Account.objects.create_superuser(
+            first_name=first_name,
+            last_name=last_name,
+            username=username,
+            email=email,
+            password=password
+        )
+        user.phone_number = phone_number
+        user.address = address
+        user.roles = role
+        user.is_admin = is_admin
+        user.save()
+
+        messages.success(request, f'{role.capitalize()} registered successfully')
+        return redirect('admin_login')
+
+    return render(request, 'admin_registration.html')

@@ -140,7 +140,7 @@
                                                         data-id="{{ user.id }}" 
                                                         data-username="{{ user.username }}" 
                                                         data-email="{{ user.email }}" 
-                                                        data-role="{{ user.role }}" 
+                                                        data-role="{{ user.get_roles_display }}" 
                                                         data-status="{{ user.is_active }}"
                                                         data-bs-toggle="modal" data-bs-target="#userModal">
                                                         <i class="bx bx-edit-alt me-1"></i> Edit
@@ -181,7 +181,7 @@
             <div class="modal-body">
 
                 <form id="userForm" method="post"
-                 action="{% url 'register' %}">
+                 action="{% url 'admin_register' %}">
                     {% csrf_token %}
                     <input type="hidden" id="userId" name="user_id">
                     
@@ -243,6 +243,7 @@
                             <option value="admin">Admin</option>
                         </select>
                     </div>
+                    
                 
                     <!-- Instructor Fields (Hidden initially) -->
                     <div id="instructorFields" style="display: none;">
@@ -285,9 +286,19 @@
     </div>
 </div>
 
-<!-- JavaScript -->
-<script src="{% static 'js/user_list_admin.js' %}"></script>
 
+
+<!-- JavaScript -->
+{% comment %} <script src="{% static 'js/user_list_admin.js' %}"></script> {% endcomment %}
+
+<script>
+    document.getElementById('userForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        await fetch(this.action, { method: 'POST', body: formData });
+        window.location.reload();
+    });
+</script>
 
 
 {% endblock %}
