@@ -1,61 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Dashboard</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
-            background-color: #f5f7fa;
-            margin: 0;
-        }
+{% extends "dashboard/admin_dashboard.html" %}
+{% load static %}
 
-        .button-container {
+{% block content %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+        
+        .button-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 20px;
         }
-
-        .action-btn {
-            background-color: #7dd3f7;
+        
+        .btn {
+            background-color: #79c8e4;
             color: white;
             border: none;
-            border-radius: 4px;
-            padding: 8px 15px;
+            border-radius: 5px;
+            padding: 10px 15px;
             font-size: 14px;
             cursor: pointer;
-            text-align: center;
-            text-decoration: none;
             white-space: nowrap;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s;
         }
-
-        .action-btn:hover {
-            background-color: #5fc1eb;
+        
+        .btn:hover {
+            background-color: #5ab0cc;
         }
-
-        .action-label {
-            font-size: 18px;
-            font-weight: 500;
-            margin: 20px 0 10px 0;
-            color: #444;
-        }
-
-        .controls {
+        
+        .footer {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .accountant-label {
+            color: #555;
+            font-size: 16px;
+        }
+        
+        .action-buttons {
+            display: flex;
             gap: 10px;
-            margin-top: 20px;
         }
-
+        
         .edit-btn {
-            background-color: #5ebdce;
+            background-color: #4eccb3;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             width: 40px;
             height: 40px;
             display: flex;
@@ -63,12 +72,12 @@
             justify-content: center;
             cursor: pointer;
         }
-
+        
         .delete-btn {
-            background-color: #ff5b8d;
+            background-color: #ff5b77;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             width: 40px;
             height: 40px;
             display: flex;
@@ -76,211 +85,69 @@
             justify-content: center;
             cursor: pointer;
         }
-
-        /* SVG icons */
-        .icon {
-            width: 20px;
-            height: 20px;
-            fill: white;
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .button-grid {
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .button-grid {
+                justify-content: center;
+            }
+            
+            .btn {
+                flex: 0 0 calc(50% - 8px);
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="button-container">
-        <a href="#" class="action-btn">show account dashboard</a>
-        <a href="#" class="action-btn">manage print settings</a>
-        <a href="#" class="action-btn">manage expense</a>
-        <a href="#" class="action-btn">create expense</a>
-        <a href="#" class="action-btn">edit expense</a>
-        <a href="#" class="action-btn">delete expense</a>
-        <a href="#" class="action-btn">manage invoice</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">create invoice</a>
-        <a href="#" class="action-btn">edit invoice</a>
-        <a href="#" class="action-btn">delete invoice</a>
-        <a href="#" class="action-btn">show invoice</a>
-        <a href="#" class="action-btn">create payment invoice</a>
-        <a href="#" class="action-btn">delete payment invoice</a>
-        <a href="#" class="action-btn">send invoice</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">delete invoice product</a>
-        <a href="#" class="action-btn">convert invoice</a>
-        <a href="#" class="action-btn">manage constant unit</a>
-        <a href="#" class="action-btn">create constant unit</a>
-        <a href="#" class="action-btn">edit constant unit</a>
-        <a href="#" class="action-btn">delete constant unit</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">manage constant tax</a>
-        <a href="#" class="action-btn">create constant tax</a>
-        <a href="#" class="action-btn">edit constant tax</a>
-        <a href="#" class="action-btn">delete constant tax</a>
-        <a href="#" class="action-btn">manage constant category</a>
-        <a href="#" class="action-btn">create constant category</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">edit constant category</a>
-        <a href="#" class="action-btn">delete constant category</a>
-        <a href="#" class="action-btn">manage product & service</a>
-        <a href="#" class="action-btn">create product & service</a>
-        <a href="#" class="action-btn">edit product & service</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">delete product & service</a>
-        <a href="#" class="action-btn">manage customer</a>
-        <a href="#" class="action-btn">create customer</a>
-        <a href="#" class="action-btn">edit customer</a>
-        <a href="#" class="action-btn">delete customer</a>
-        <a href="#" class="action-btn">show customer</a>
-        <a href="#" class="action-btn">manage vender</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">create vender</a>
-        <a href="#" class="action-btn">edit vender</a>
-        <a href="#" class="action-btn">delete vender</a>
-        <a href="#" class="action-btn">show vender</a>
-        <a href="#" class="action-btn">manage bank account</a>
-        <a href="#" class="action-btn">create bank account</a>
-        <a href="#" class="action-btn">edit bank account</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">delete bank account</a>
-        <a href="#" class="action-btn">manage bank transfer</a>
-        <a href="#" class="action-btn">create bank transfer</a>
-        <a href="#" class="action-btn">edit bank transfer</a>
-        <a href="#" class="action-btn">delete bank transfer</a>
-        <a href="#" class="action-btn">manage transaction</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">manage revenue</a>
-        <a href="#" class="action-btn">create revenue</a>
-        <a href="#" class="action-btn">edit revenue</a>
-        <a href="#" class="action-btn">delete revenue</a>
-        <a href="#" class="action-btn">manage bill</a>
-        <a href="#" class="action-btn">create bill</a>
-        <a href="#" class="action-btn">edit bill</a>
-        <a href="#" class="action-btn">delete bill</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">show bill</a>
-        <a href="#" class="action-btn">manage payment</a>
-        <a href="#" class="action-btn">create payment</a>
-        <a href="#" class="action-btn">edit payment</a>
-        <a href="#" class="action-btn">delete payment</a>
-        <a href="#" class="action-btn">delete bill product</a>
-        <a href="#" class="action-btn">send bill</a>
-    </div>
-
-    <div class="action-label">accountant</div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">create payment bill</a>
-        <a href="#" class="action-btn">delete payment bill</a>
-        <a href="#" class="action-btn">income report</a>
-        <a href="#" class="action-btn">expense report</a>
-        <a href="#" class="action-btn">income vs expense report</a>
-        <a href="#" class="action-btn">invoice report</a>
-        <a href="#" class="action-btn">bill report</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">stock report</a>
-        <a href="#" class="action-btn">tax report</a>
-        <a href="#" class="action-btn">loss & profit report</a>
-        <a href="#" class="action-btn">manage credit note</a>
-        <a href="#" class="action-btn">create credit note</a>
-        <a href="#" class="action-btn">edit credit note</a>
-        <a href="#" class="action-btn">delete credit note</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">manage debit note</a>
-        <a href="#" class="action-btn">create debit note</a>
-        <a href="#" class="action-btn">edit debit note</a>
-        <a href="#" class="action-btn">delete debit note</a>
-        <a href="#" class="action-btn">manage proposal</a>
-        <a href="#" class="action-btn">create proposal</a>
-        <a href="#" class="action-btn">edit proposal</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">delete proposal</a>
-        <a href="#" class="action-btn">duplicate proposal</a>
-        <a href="#" class="action-btn">show proposal</a>
-        <a href="#" class="action-btn">send proposal</a>
-        <a href="#" class="action-btn">delete proposal product</a>
-        <a href="#" class="action-btn">manage goal</a>
-        <a href="#" class="action-btn">create goal</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">edit goal</a>
-        <a href="#" class="action-btn">delete goal</a>
-        <a href="#" class="action-btn">manage assets</a>
-        <a href="#" class="action-btn">create assets</a>
-        <a href="#" class="action-btn">edit assets</a>
-        <a href="#" class="action-btn">delete assets</a>
-        <a href="#" class="action-btn">statement report</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">manage constant custom field</a>
-        <a href="#" class="action-btn">create constant custom field</a>
-        <a href="#" class="action-btn">edit constant custom field</a>
-        <a href="#" class="action-btn">delete constant custom field</a>
-        <a href="#" class="action-btn">manage chart of account</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">create chart of account</a>
-        <a href="#" class="action-btn">edit chart of account</a>
-        <a href="#" class="action-btn">delete chart of account</a>
-        <a href="#" class="action-btn">manage journal entry</a>
-        <a href="#" class="action-btn">create journal entry</a>
-        <a href="#" class="action-btn">edit journal entry</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">delete journal entry</a>
-        <a href="#" class="action-btn">show journal entry</a>
-        <a href="#" class="action-btn">balance sheet report</a>
-        <a href="#" class="action-btn">ledger report</a>
-        <a href="#" class="action-btn">trial balance report</a>
-        <a href="#" class="action-btn">create budget plan</a>
-    </div>
-
-    <div class="button-container">
-        <a href="#" class="action-btn">edit budget plan</a>
-        <a href="#" class="action-btn">manage budget plan</a>
-        <a href="#" class="action-btn">delete budget plan</a>
-        <a href="#" class="action-btn">view budget plan</a>
-        <a href="#" class="action-btn">create barcode</a>
-        <a href="#" class="action-btn">create webhook</a>
-        <a href="#" class="action-btn">edit webhook</a>
-    </div>
-
-    <div class="controls">
-        <button class="edit-btn">
-            <svg class="icon" viewBox="0 0 24 24">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-            </svg>
-        </button>
-        <button class="delete-btn">
-            <svg class="icon" viewBox="0 0 24 24">
-                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-            </svg>
-        </button>
+    <p>permissions assigned {{user.user.first_name}} {{user.user.last_name}}</p>
+    <div class="container">
+        <div class="button-grid">
+            {% if permissions %}
+                {% if permissions.can_manage %}
+                <button class="btn">profile Can Manage</button>
+                {% endif %}
+                {% if permissions.can_create %}
+                <button class="btn">profile Can create</button>
+                {% endif %}
+                {% if permissions.can_edit %}
+                <button class="btn">profile Can edit</button>
+                {% endif %}
+                {% if permissions.can_delete %}
+                <button class="btn">profile Can delete</button>
+                {% endif %}
+            {% else %}
+            <p>No permissions assigned yet.</p>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <div class="accountant-label">accountant</div>
+            <div class="action-buttons">
+                <button class="edit-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.71 7.04C21.1 6.65 21.1 6.08 20.71 5.69L18.31 3.29C17.92 2.9 17.35 2.9 16.96 3.29L15.12 5.12L18.87 8.87L20.71 7.04ZM3 17.25V21H6.75L17.81 9.93L14.06 6.18L3 17.25Z" fill="white"/>
+                    </svg>
+                </button>
+                <button class="delete-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="white"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
     </div>
 </body>
-</html>
+
+{% endblock content %}
