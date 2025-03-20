@@ -20,6 +20,10 @@ from django.contrib import messages
 from .models import Account
 from .forms import AdminUserForm
 
+from student.models import Student
+from  parant.models import Parant 
+from guest.models import Guest
+
 def generate_otp():
     return str(random.randint(100000, 999999))  # 6-digit OTP
 
@@ -331,11 +335,54 @@ def admin_register(request):
         user.roles = role
         user.is_admin = is_admin
         user.save()
+        
+        if role == 'student':
+            Student.objects.create(user=user)
+        elif role == 'parent':
+            Parant.objects.create(user=user)
+        elif role == 'guest':
+            Guest.objects.create(user=user)
 
-        messages.success(request, f'{role.capitalize()} registered successfully')
-        return redirect('admin_login')
+
+        messages.success(request, f'{role.capitalize()} registered successfully. Now assign permissions.')
+        return redirect('search_and_select')+ f'?keyword={user.unique_key}'
 
     return render(request, 'admin_registration.html')
 
 
+@login_required
+def profile_edit(request):
+    """ Edit user profile """
+    if request.method == "POST":
+        user = request.user
 
+        # Update user fields
+        user.username = request.POST.get('username', user.username)
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.email = request.POST.get('email', user.email)
+        user.phone_number = request.POST.get('phone_number', user.phone_number)
+        user.address = request.POST.get('address', user.address)
+
+        # Handle profile image upload
+        if 'profile_image' in request.FILES:
+            user.profile_image = request.FILES['profile_image']
+
+        # Save the updated user data
+        user.save()
+        messages.success(request, "Profile updated successfully!")
+        return redirect('profile_view')
+
+    return render(request, 'profile.html', {'user': request.user})
+
+
+@login_required
+def profile_delete(request):
+    """ Delete user profile """
+    user = request.user
+
+    if request.method == "POST":
+        user.delete()
+        messages.success(request, "Profile deleted successfully!")
+        return redirect('home')  # Redirect to home or login page after deletion
+
+    return render(request, 'confirm_delete.html', {'user': user})

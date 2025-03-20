@@ -198,11 +198,15 @@
             <button class="nav-item" data-role="parent" data-tab="account">Parent</button>
         </div>
 
+        {% if user %}
         {% if user.roles == 'admin' %} {% include "adminapp/admin_roles_form.html" %} {% endif %}
         {% if user.roles == 'student' %} {% include "student/student_roles_form.html" %} {% endif %}
         {% if user.roles == 'teacher' %} {% include "teacher/teacher_roles_form.html" %} {% endif %}
         {% if user.roles == 'parent' %}{% include "parent/parent_roles_form.html" %}{% endif %}
         {% if user.roles == 'guest' %} {% include "guest/guest_roles_form.html" %} {% endif %}
+        {% else %}
+        <p>No user found. Please search by unique key.</p>
+        {% endif %}
 
     </div>
 

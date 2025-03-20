@@ -19,7 +19,7 @@
       </ul>
       <div class="card mb-4">
         <h5 class="card-header">Profile Detailsss</h5>
-        <form id="formAccountSettings" method="POST" enctype="multipart/form-data" action="{% url 'profile_view' %}">
+        <form id="formAccountSettings" method="POST" enctype="multipart/form-data" action="{% url 'profile_edit' %}">
           {% csrf_token %}
           <div class="card-body">
             <div class="d-flex align-items-start align-items-sm-center gap-4">
