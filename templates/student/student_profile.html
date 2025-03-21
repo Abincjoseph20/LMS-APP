@@ -88,9 +88,11 @@
             <p class="mb-0">Once you delete your account, there is no going back. Please be certain.</p>
           </div>
         </div>
-
+    <!-- Add form around the checkbox and button -->
+        <form method="POST" action="{% url 'profile_delete' %}">
+          {% csrf_token %}
         <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" name="accountActivation" id="accountActivation" required />
+          <input class="form-check-input" type="checkbox" name="confirm_delete" id="confirm_delete" required />
           <label class="form-check-label" for="accountActivation">
             I confirm my account deactivation
           </label>

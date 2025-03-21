@@ -6,6 +6,7 @@ from adminapp.models import Account
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from adminapp.models import Account
+from .models import Student, Student_ProfilePermission
 
 
 def assign_permissions(request, user_id):
@@ -68,10 +69,18 @@ def success(request, user_id=None):
 
 @login_required
 def profile_edit(request):
-    """ Edit user profile """
     if request.method == "POST":
         user = request.user
-
+        
+        student = get_object_or_404(Student, user=user)
+        permissions = Student_ProfilePermission.objects.filter(student=student).first()
+        
+        # Check if the user has edit permissions
+        if not permissions or not permissions.can_edit:
+            messages.error(request, "You do not have permission to edit this profile.")
+            return redirect('profile_view')
+        
+        # Handle profile image upload
         if 'profile_image' in request.FILES:
             user.profile_image = request.FILES['profile_image']
             user.save()
@@ -90,17 +99,33 @@ def profile_edit(request):
         messages.success(request, "Profile updated successfully!")
         return redirect('profile_view')
 
-    return render(request, 'profile.html', {'user': request.user})
+    return render(request, 'profile.html', {'user': user})
 
 
 @login_required
 def profile_delete(request):
-    """ Delete user profile """
     user = request.user
 
+    # Ensure the student and permissions are correctly fetched
+    student = get_object_or_404(Student, user=user)
+    permissions = Student_ProfilePermission.objects.filter(student=student).first()
+    
+    if not permissions or not permissions.can_delete:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+
     if request.method == "POST":
-        user.delete()
-        messages.success(request, "Profile deleted successfully!")
-        return redirect('home')  # Redirect to home or login page after deletion
+        # Check if the confirmation checkbox is checked
+        if 'confirm_delete' in request.POST:
+            user.delete()
+            messages.success(request, "Your account has been deleted successfully.")
+            return redirect('register')  # Redirect to home or login page
+        else:
+            messages.error(request, "Please confirm the deletion before proceeding.")
+            return redirect('profile_view')
 
     return render(request, 'confirm_delete.html', {'user': user})
+
+
+
+
