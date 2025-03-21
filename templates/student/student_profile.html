@@ -32,10 +32,9 @@
                   <input type="file" id="upload" class="account-file-input" hidden name="profile_image"
                     accept="image/png, image/jpeg" onchange="previewImage(event)" />
                 </label>
-                <button type="button" class="btn btn-outline-secondary account-image-reset mb-4" id="resetButton">
-                  <i class="bx bx-reset d-block d-sm-none"></i>
-                  <span class="d-none d-sm-block">Reset</span>
-                </button>
+
+                <input type="hidden" id="resetImage" name="reset_image" value="0">
+
                 <p class="text-muted mb-0">Allowed JPG, GIF, or PNG. Max size of 800KB.</p>
               </div>
             </div>
@@ -104,6 +103,14 @@
 </div>
 </div>
 <!-- / Content -->
+
+<script>
+  // Automatically submit the form after selecting an image
+  function autoUpload() {
+    document.getElementById('imageUploadForm').submit();
+  }
+</script>
+
 
 
 {% endblock %}
