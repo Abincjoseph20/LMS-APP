@@ -184,6 +184,7 @@
 
             <!-- Search Form -->
             <form method="GET" action="{% url 'search_and_select' %}" class="search-wrapper">
+                {% csrf_token %}  
                 <input type="text" id="role-search" name="keyword" value="{{ request.GET.keyword }}" class="form-control" placeholder="Search by user key">
                 <button type="submit" class="search-btn">Search</button>
             </form>
@@ -201,8 +202,8 @@
         {% if user %}
         {% if user.roles == 'admin' %} {% include "adminapp/admin_roles_form.html" %} {% endif %}
         {% if user.roles == 'student' %} {% include "student/student_roles_form.html" %} {% endif %}
-        {% if user.roles == 'teacher' %} {% include "teacher/teacher_roles_form.html" %} {% endif %}
-        {% if user.roles == 'parent' %}{% include "parent/parent_roles_form.html" %}{% endif %}
+        {% if user.roles|lower == 'teacher' %} {% include "teacher/teacher_roles_form.html" %} {% endif %}
+        {% if user.roles|lower == 'parent' %}{% include "parent/parent_roles_form.html" %}{% endif %}
         {% if user.roles == 'guest' %} {% include "guest/guest_roles_form.html" %} {% endif %}
         {% else %}
         <p>No user found. Please search by unique key.</p>

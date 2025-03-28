@@ -1,5 +1,5 @@
 <p>User ID: {{ user.id }}</p>
-<form method="POST" action="{% url 'assign_permissions' user.pk %}">
+<form method="POST" action="{% url 'student_assign_permissions' user.pk %}">
     {% csrf_token %}
     
     <table>
@@ -35,8 +35,6 @@
                     <div class="permission-item">
                         <input type="checkbox" class="permission-checkbox" name="can_delete" value="True"
                          {% if student.profile_permissions.first.can_delete %}checked{% endif %}> 
-
-                         
                          <label>Delete</label>
                     </div>
                 </td>

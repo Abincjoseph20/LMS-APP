@@ -14,7 +14,7 @@ urlpatterns = [
     path('teacher_dashboard/',views.teacher_dashboard, name='teacher_dashboard'),
     path('student_dashboard/',views.student_dashboard, name='student_dashboard'),
     path('parent_dashboard/',views.parent_dashboard, name='parent_dashboard'),
-    
+    path('guest_dashboard/',views.guest_dashboard, name='guest_dashboard'),
     
     
     path('all_users_list/', views.all_users_list, name='all_users_list'),
@@ -25,11 +25,12 @@ urlpatterns = [
     #profiles
     path('profile_view/', views.profile_view, name='profile_view'),
     
-    path('profile_view/', views.profile_view, name='admin_profile'),
+    # path('profile_view/', views.profile_view, name='admin_profile'),
+    
     path('student_profile/', views.profile_view, name='student_profile'),
     path('Teacher_profile/', views.profile_view, name='Teacher_profile'),
     path('guest_profile/', views.profile_view, name='guest_profile'),
-    path('parant_profile/',views.profile_view,name='parant_profile'),
+    path('parent_profile/',views.profile_view,name='parent_profile'),
     
     path('admin_register/', views.admin_register, name='admin_register'), 
     

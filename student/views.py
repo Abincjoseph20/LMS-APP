@@ -1,3 +1,4 @@
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import StudentProfilePermissionForm
@@ -9,7 +10,7 @@ from adminapp.models import Account
 from .models import Student, Student_ProfilePermission
 
 
-def assign_permissions(request, user_id):
+def student_assign_permissions(request, user_id):
     account = get_object_or_404(Account, id=user_id)  # Get the student by Account model
     student = get_object_or_404(Student, user=account)
     
@@ -34,7 +35,7 @@ def assign_permissions(request, user_id):
             print("Permissions saved successfully!")
 
             messages.success(request, f"Permissions assigned successfully to {account.first_name} {account.last_name}.")
-            return redirect('success_page',user_id=user_id)  # Redirect to success page
+            return redirect('student_success_page',user_id=user_id)  # Redirect to success page
         else:
             messages.error(request, "Failed to assign permissions. Please check the form.")
     else:
@@ -48,7 +49,7 @@ def assign_permissions(request, user_id):
     return render(request, 'student/student_roles_form.html', {'form': form, 'user': student})
 
 
-def success(request, user_id=None):
+def student_success(request, user_id=None):
     student = None
     permissions = None
     
@@ -65,7 +66,6 @@ def success(request, user_id=None):
         'user': student,
         'permissions': permissions
     })
-
 
 @login_required
 def profile_edit(request):

@@ -10,11 +10,11 @@ class Guest(models.Model):
 
 # **Profile Permission Model**
 class Guest_ProfilePermission(models.Model):
-    student = models.ForeignKey(Guest, on_delete=models.CASCADE,related_name="profile_permissions")
+    guest = models.ForeignKey(Guest, on_delete=models.CASCADE,related_name="profile_permissions")
     can_manage = models.BooleanField(default=False)
     can_create = models.BooleanField(default=False)
     can_edit = models.BooleanField(default=False)
     can_delete = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.student.user.username} Profile Permissions"
+        return f"{self.guest.user.username} Profile Permissions"

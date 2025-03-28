@@ -11,7 +11,6 @@ from django.contrib.auth.decorators import login_required
 from.decorators import allowed_roles
 from django.contrib.auth import get_user_model
 
-
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
 import json 
@@ -21,8 +20,9 @@ from .models import Account
 from .forms import AdminUserForm
 
 from student.models import Student
-from  parant.models import Parant 
+from  parent.models import Parent 
 from guest.models import Guest
+from teacher.models import Teacher
 
 def generate_otp():
     return str(random.randint(100000, 999999))  # 6-digit OTP
@@ -188,7 +188,7 @@ def login(request):
                 elif user.roles == 'Parent':
                     return redirect('parent_dashboard')  
                 elif user.roles == 'guest':
-                    return redirect('')
+                    return redirect('guest_dashboard')
                 else:
                     return redirect('home')    
             else:
@@ -222,6 +222,9 @@ def student_dashboard(request):
 
 def parent_dashboard(request):
     return render(request, 'dashboard/parent_dashboard.html')
+
+def guest_dashboard(request):
+    return render(request,'dashboard/guest_dashboard.html')
 
 
 @login_required
@@ -261,12 +264,12 @@ def profile_view(request):
             elif request.user.roles == 'student':
                 # print("Profile updated successfully")
                 return redirect('student_profile')  # Replace with the correct URL name for student
-            elif request.user.roles == 'Teacher':
+            elif request.user.roles == 'teacher':
                 return redirect('Teacher_profile')  # Replace with the correct URL name for instructor
             elif request.user.roles == 'guest':
                 return redirect('guest_profile')
-            elif request.user.roles == 'parant':
-                return redirect('parant_profile')
+            elif request.user.roles == 'parent':
+                return redirect('parent_profile')
         else:
             print("Form is not valid:", profile_form.errors)
     else:
@@ -281,8 +284,8 @@ def profile_view(request):
         template_name = 'teacher/teacher_profile.html'
     elif request.user.roles == 'guest':
         template_name = 'guest/guest_profile.html'
-    elif request.user.roles == 'parant':
-        template_name = 'parant/parant_profile.html'
+    elif request.user.roles == 'parent':
+        template_name = 'parent/parent_profile.html'
     else:
         template_name = 'admin/admin_profile.html'  # Fallback template for undefined roles
 
@@ -339,10 +342,11 @@ def admin_register(request):
         if role == 'student':
             Student.objects.create(user=user)
         elif role == 'parent':
-            Parant.objects.create(user=user)
+            Parent.objects.create(user=user)
         elif role == 'guest':
             Guest.objects.create(user=user)
-
+        elif role == 'teacher':
+            Teacher.objects.create(user=user)
 
         messages.success(request, f'{role.capitalize()} registered successfully. Now assign permissions.')
         return redirect('search_and_select')+ f'?keyword={user.unique_key}'

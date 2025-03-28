@@ -108,6 +108,7 @@
                                         <th>No.</th>
                                         <th>Username</th>
                                         <th>Email</th>
+                                        <th>U/ID</th>
                                         <th>Role</th>
                                         <th>Status</th>
                                         <th>Actions</th>
@@ -119,8 +120,9 @@
                                         <td>{{ forloop.counter }}</td>
                                         <td class="username">{{ user.username }}</td>
                                         <td class="email">{{ user.email }}</td>
+                                        <td class="email">{{ user.user_key }}</td>
                                         <td class="role">
-                                            <span class="badge bg-label-primary">{{ user.get_role_display }}</span>
+                                            <span class="badge bg-label-primary">{{ user.roles }}</span>
                                         </td>
                                         <td>
                                             {% if user.is_active %}
@@ -239,7 +241,7 @@
                         <select id="role" name="role" class="form-select" required>
                             <option value="" disabled selected>Select Role</option>
                             <option value="student">Student</option>
-                            <option value="instructor">Instructor</option>
+                            <option value="teacher">Instructor</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>

@@ -9,15 +9,15 @@ class Teacher(models.Model):
 
 
 # **Profile Permission Model**
-class Teacheer_ProfilePermission(models.Model):
-    student = models.ForeignKey(Teacher, on_delete=models.CASCADE,related_name="profile_permissions")
+class Teacher_ProfilePermission(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE,related_name="profile_permissions")
     can_manage = models.BooleanField(default=False)
     can_create = models.BooleanField(default=False)
     can_edit = models.BooleanField(default=False)
     can_delete = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.student.user.username} Profile Permissions"
+        return f"{self.teacher.user.username} Profile Permissions"
 
 
 
