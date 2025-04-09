@@ -23,19 +23,18 @@ urlpatterns = [
     
     
     #profiles
-    path('profile_view/', views.profile_view, name='profile_view'),
+    # path('profile_view/', views.profile_view, name='profile_view'),
     
-    # path('profile_view/', views.profile_view, name='admin_profile'),
-    
+    path('profile_view/', views.profile_view, name='admin_profile'),
     path('student_profile/', views.profile_view, name='student_profile'),
-    path('Teacher_profile/', views.profile_view, name='Teacher_profile'),
+    path('teacher_profile/', views.profile_view, name='teacher_profile'),
     path('guest_profile/', views.profile_view, name='guest_profile'),
     path('parent_profile/',views.profile_view,name='parent_profile'),
     
     path('admin_register/', views.admin_register, name='admin_register'), 
     
     path('profile/', views.profile_view, name='profile_view'),
-
     
+        
 ]
 

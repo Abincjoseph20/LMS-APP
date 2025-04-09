@@ -177,7 +177,7 @@
                 <option value="">Select Role Type</option>
                 <option value="admin" {% if user.roles == 'admin' %}selected{% endif %}>Admin</option>
                 <option value="student" {% if user.roles == 'student' %}selected{% endif %}>Student</option>
-                <option value="Teacher" {% if user.roles == 'Teacher' %}selected{% endif %}>Teacher</option>
+                <option value="Teacher" {% if user.roles == 'teacher' %}selected{% endif %}>Teacher</option>
                 <option value="Parent" {% if user.roles == 'Parent' %}selected{% endif %}>Parent</option> 
                 <option value="guest" {% if user.roles == 'guest' %}selected{% endif %}>Guest</option>
             </select>

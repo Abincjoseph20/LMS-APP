@@ -67,6 +67,7 @@ def student_success(request, user_id=None):
         'permissions': permissions
     })
 
+
 @login_required
 def profile_edit(request):
     if request.method == "POST":
@@ -79,13 +80,14 @@ def profile_edit(request):
         if not permissions or not permissions.can_edit:
             messages.error(request, "You do not have permission to edit this profile.")
             return redirect('profile_view')
-        
+              
         # Handle profile image upload
         if 'profile_image' in request.FILES:
             user.profile_image = request.FILES['profile_image']
             user.save()
             messages.success(request, "Profile image updated successfully!")
             return redirect('profile_view')
+
         
         # Update user fields
         user.username = request.POST.get('username', user.username)
@@ -125,7 +127,3 @@ def profile_delete(request):
             return redirect('profile_view')
 
     return render(request, 'confirm_delete.html', {'user': user})
-
-
-
-

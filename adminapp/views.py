@@ -214,8 +214,11 @@ def Home(request):
 def admin_dashboard(request):
     return render(request, 'dashboard/admin_dashboard.html')
 
+# def teacher_dashboard(request):
+#     return render(request, 'dashboard/teacher_dashboard.html')
+
 def teacher_dashboard(request):
-    return render(request, 'dashboard/teacher_dashboard.html')
+    return render(request, 'teacher/teacher_dashboard.html')
 
 def student_dashboard(request):
     return render(request, 'student/student_dashboard.html')
@@ -260,12 +263,11 @@ def profile_view(request):
             profile_form.save()
             
             if request.user.roles == 'admin':
-                return redirect('admin_profile')  # Replace with the correct URL name for admin
+                return redirect('admin_profile')
             elif request.user.roles == 'student':
-                # print("Profile updated successfully")
-                return redirect('student_profile')  # Replace with the correct URL name for student
+                return redirect('student_profile')
             elif request.user.roles == 'teacher':
-                return redirect('Teacher_profile')  # Replace with the correct URL name for instructor
+                return redirect('teacher_profile') 
             elif request.user.roles == 'guest':
                 return redirect('guest_profile')
             elif request.user.roles == 'parent':
@@ -287,7 +289,7 @@ def profile_view(request):
     elif request.user.roles == 'parent':
         template_name = 'parent/parent_profile.html'
     else:
-        template_name = 'admin/admin_profile.html'  # Fallback template for undefined roles
+        template_name = 'teacher/teacher_profile.html'  # Fallback template for undefined roles
 
     context = {
         'profile_form': profile_form,
@@ -352,3 +354,5 @@ def admin_register(request):
         return redirect('search_and_select')+ f'?keyword={user.unique_key}'
 
     return render(request, 'admin_registration.html')
+
+
