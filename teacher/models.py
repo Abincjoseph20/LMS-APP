@@ -165,3 +165,67 @@ class UserCourses(models.Model):
 
 #     def __str__(self):
 #         return self.user.first_name + " -- " + self.course.title  
+
+
+
+
+
+
+class Lessons(models.Model):
+    course=models.ForeignKey(Course,on_delete=models.CASCADE)
+    name=models.CharField(max_length=200)
+    
+    def __str__(self):
+        return self.name + " - " + self.course.title
+    
+    
+    
+# models
+class CourseResource(models.Model):
+    RESOURCE_TYPE = (
+        ('Note', 'Note'),
+        ('PDF', 'PDF'),
+        ('PPT', 'PPT'),
+    )
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    resource_type = models.CharField(choices=RESOURCE_TYPE, max_length=10)
+    title = models.CharField(max_length=500)
+    file = models.FileField(upload_to="course_resources/",default='path/to/default/file.pdf')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    #   @classmethod
+    def get_all_category(cls):
+        return cls.objects.all()
+    
+    def __str__(self):
+        return f"{self.title} - {self.resource_type} for {self.course.title}"
+    
+    
+    
+class What_u_learn(models.Model):
+    course=models.ForeignKey(Course,on_delete=models.CASCADE)
+    points=models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.points
+    
+    
+class Requirements(models.Model):
+    course=models.ForeignKey(Course,on_delete=models.CASCADE)
+    points=models.CharField(max_length=500) 
+
+    def __str__(self):
+        return self.points
+
+
+
+class VideoModels(models.Model):  
+    serial_number = models.IntegerField(null=True)
+    thumbnail = models.ImageField(upload_to="Media/Yt_Thumbnail", null=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    video = models.FileField(upload_to='course_videos/', null=True, blank=True)
+    time_duration = models.IntegerField(null=True)
+    preview = models.BooleanField(default=False)
+    def __str__(self):
+        return self.title 

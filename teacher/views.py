@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import  Teacher,Teacher_ProfilePermission,Categories,Instructor,Levels,Language,Course,VideoModel,UserCourses
+from .models import  Teacher,Teacher_ProfilePermission,Categories,Instructor,Levels,Language,Course,VideoModel,UserCourses,Lessons,CourseResource,What_u_learn,Requirements,VideoModels
 from adminapp.models import Account
-from .forms import Teacher_ProfilePermissionForm,CategoryForm,InstructorForm,LevelForm,LanguageForm,CourseForm
+from .forms import Teacher_ProfilePermissionForm,CategoryForm,InstructorForm,LevelForm,LanguageForm,CourseForm,LessonForm,CourseResourceForm,WhatULearnForm,RequirementsForm,VideosForm
 from django.contrib.auth.decorators import login_required
 from .decorators import allowed_roles
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -573,7 +573,7 @@ def update_course(request, course_id):
         form = CourseForm(instance=course)
         # print(course.author)
         # print(form)
-    return render(request, 'lecture/update_course.html', {'form': form,'course':course})
+    return render(request, 'teacher/update_coruse.html', {'form': form,'course':course})
 
 @login_required
 def delete_course(request, course_id):
@@ -583,3 +583,229 @@ def delete_course(request, course_id):
         messages.success(request, "Course deleted successfully!")
         return redirect('course_list')
     return render(request, 'courses/course_confirm_delete.html', {'course': course})
+
+
+
+
+# Add a lesson
+@login_required
+def add_lesson(request):
+    if request.method == 'POST':
+        form = LessonForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Lesson added successfully!")
+            return redirect('lesson_list')
+    else:
+        form = LessonForm(user = request.user)
+    return render(request, 'teacher/add_lesson.html', {'form': form})
+
+# Display all lessons
+@login_required
+def lesson_list(request):
+    try:
+        auther = Instructor.objects.get( user = request.user)
+        my_course = Course.objects.filter(author = auther)
+        lessons = Lessons.objects.filter(course__in= my_course)
+        return render(request, 'teacher/lesson_list.html', {'lessons': lessons})
+    except:
+        return render(request, 'teacher/lesson_list.html')
+    
+
+# Update a lesson
+def update_lesson(request, lesson_id):
+    lesson = get_object_or_404(Lessons, id=lesson_id)
+    if request.method == 'POST':
+        form = LessonForm(request.POST, instance=lesson)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Lesson updated successfully!")
+            return redirect('lesson_list')
+    else:
+        form = LessonForm(instance=lesson, user = request.user)
+    return render(request, 'teacher/update_lesson.html', {'form': form})
+
+# Delete a lesson
+def delete_lesson(request, lesson_id):
+    lesson = get_object_or_404(Lessons, id=lesson_id)
+    if request.method == 'POST':
+        lesson.delete()
+        messages.success(request, "Lesson deleted successfully!")
+    return redirect('lesson_list')
+
+
+
+
+# START Course Resources
+def add_course_resource(request):
+    if request.method == 'POST':
+        form = CourseResourceForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Resource added successfully!")
+            return redirect('resource_list')
+    else:
+        form = CourseResourceForm(user = request.user)
+    return render(request, 'teacher/add_resource.html', {'form': form})
+
+
+def resource_list(request):
+    try:
+        auther = Instructor.objects.get( user = request.user)
+        my_courses = Course.objects.filter(author = auther)
+        resource = CourseResource.objects.filter(course__in= my_courses)
+        context = {'resources' : resource}
+    except:
+        context = {'resources' : None}
+    return render(request, 'teacher/resource_list.html', context)
+
+@login_required
+def update_course_resource(request, resource_id):
+    resource = get_object_or_404(CourseResource, id=resource_id)
+    if request.method == 'POST':
+        form = CourseResourceForm(request.POST, request.FILES, instance=resource)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Resource updated successfully!")
+            return redirect('resource_list')
+    else:
+        form = CourseResourceForm(instance=resource, user = request.user)
+    return render(request, 'teacher/update_resource.html', {'form': form})
+
+@login_required
+def delete_course_resource(request, resource_id):
+    resource = get_object_or_404(CourseResource, id=resource_id)
+    resource.delete()
+    messages.success(request, "Resource deleted successfully!")
+    return redirect('resource_list')
+
+
+
+#what u learn
+
+def add_what_u_learn(request):
+    if request.method == 'POST':
+        form = WhatULearnForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Points learned added successfully!")
+            return redirect('what_u_learn_list')
+    else:
+        form = WhatULearnForm()
+    return render(request, 'teacher/add_what_u_learn.html', {'form': form})
+
+
+def what_u_learn_list(request):
+    what_u_learn_entries = What_u_learn.objects.all()
+    return render(request, 'teacher/what_u_learn_list.html', {'what_u_learn_entries': what_u_learn_entries})
+
+
+def update_what_u_learn(request, entry_id):
+    entry = get_object_or_404(What_u_learn, id=entry_id)
+    if request.method == 'POST':
+        form = WhatULearnForm(request.POST, instance=entry)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Points learned updated successfully!")
+            return redirect('what_u_learn_list')
+    else:
+        form = WhatULearnForm(instance=entry)
+    return render(request, 'teacher/update_what_u_learn.html', {'form': form})
+
+
+def delete_what_u_learn(request, entry_id):
+    if request.method == 'POST':
+        entry = get_object_or_404(What_u_learn, id=entry_id)
+        entry.delete()
+        messages.success(request, "Points learned deleted successfully!")
+    return redirect('what_u_learn_list')
+
+
+
+
+def add_requirement(request):
+    if request.method == 'POST':
+        form = RequirementsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Requirement added successfully!")
+            return redirect('requirement_list')
+    else:
+        form = RequirementsForm(user = request.user)
+    return render(request, 'teacher/add_requirement.html', {'form': form})
+
+def requirement_list(request):
+    try:
+        auther = Instructor.objects.get( user = request.user)
+        my_courses = Course.objects.filter(author = auther)
+        requirement = Requirements.objects.filter(course__in= my_courses)
+        context = {'requirements' : requirement}
+    except:
+        context = {'requirements' : None}
+    return render(request, 'teacher/requirement_list.html', context)
+
+def update_requirement(request, requirement_id):
+    requirement = get_object_or_404(Requirements, id=requirement_id)
+    if request.method == 'POST':
+        form = RequirementsForm(request.POST, instance=requirement)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Requirement updated successfully!")
+            return redirect('requirement_list')
+    else:
+        form = RequirementsForm(instance=requirement, user = request.user)
+    return render(request, 'teacher/update_requirement.html', {'form': form})
+
+def delete_requirement(request, requirement_id):
+    requirement = get_object_or_404(Requirements, id=requirement_id)
+    if request.method == 'POST':
+        requirement.delete()
+        messages.success(request, "Requirement deleted successfully!")
+    return redirect('requirement_list')    
+
+
+
+
+# Create a video
+def create_video(request):
+    if request.method == 'POST':
+        form = VideosForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Video added successfully!")
+            return redirect('view_video')
+    else:
+        form = VideosForm(user = request.user)
+    return render(request, 'teacher/create_video.html', {'form': form})
+
+# list a video
+def view_video(request):
+    try:
+        auther = Instructor.objects.get( user = request.user)
+        my_course = Course.objects.filter(author = auther)
+        videos = VideoModel.objects.filter(course__in = my_course)
+        context = {'videos' : videos}
+    except:
+        context = {'videos' : None}
+    return render(request, 'teacher/view_video.html', context)
+
+# update a video
+def video_update(request, video_id):
+    video = get_object_or_404(VideoModel, id=video_id)
+    if request.method == 'POST':
+        form = VideosForm(request.POST, request.FILES, instance=video)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Video updated successfully!")
+            return redirect('view_video')
+    else:
+        form = VideosForm(instance=video, user = request.user)
+    return render(request, 'teacher/video_update.html', {'form': form})
+
+# Delete a video
+def delete_videos(request, video_id):
+    video = get_object_or_404(VideoModel, id=video_id)
+    if request.method == 'POST':
+        VideoModel.delete()
+        messages.success(request, "Video deleted successfully!")
+    return redirect('video_list')
