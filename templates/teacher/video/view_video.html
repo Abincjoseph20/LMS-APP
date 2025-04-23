@@ -4,6 +4,7 @@
 {% block content %}
 <div class="content-wrapper">
     <!-- Content -->
+    <p>Total videos: {{ videos|length }}</p>
 
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Tables /</span> Video List</h4>
@@ -52,7 +53,7 @@
                                 <td>{{ video.time_duration }} Minutes</td>
                                 <td>
                                     <a href="{% url 'video_update' video.id %}" class="btn btn-warning btn-sm">Edit</a>
-                                    <form method="POST" action="" style="display:inline;">
+                                    <form method="POST" action="{% url 'delete_videos' video.id %}" style="display:inline;">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                     </form>

@@ -1,10 +1,21 @@
 from django import forms
-from .models import Teacher_ProfilePermission,Categories,Instructor,Levels,Language,Course,Lessons,CourseResource,What_u_learn,Requirements,VideoModels
+from .models import Teacher_ProfilePermission,Categories,Instructor,Levels,Language,Course,Lesson,CourseResource,What_u_learn,Requirements,VideoModels,Quiz,Question
+
+
 
 class Teacher_ProfilePermissionForm(forms.ModelForm):
     class Meta:
         model = Teacher_ProfilePermission
-        fields = ['can_manage', 'can_create', 'can_edit', 'can_delete']
+        fields = ['can_manage', 'can_create', 'can_edit', 'can_delete','manage_categories','create_categories',
+                  'edit_categories','delete_categories','manage_Instructor','create_Instructor','edit_Instructor',
+                  'delete_Instructor','manage_Levels','create_Levels','edit_Levels','delete_Levels','manage_Language',
+                  'create_Language','edit_Language','delete_Language','manage_Course','create_Course','edit_Course',
+                  'delete_Course','manage_Lesson','create_Lesson','edit_Lesson','delete_Lesson','manage_CourseResource',
+                  'create_CourseResource','edit_CourseResource','delete_CourseResource','manage_What_u_learn',
+                  'create_What_u_learn','edit_What_u_learn','delete_What_u_learn','manage_Requirements',
+                  'create_Requirements','edit_Requirements','delete_Requirements','manage_VideoModels','create_VideoModels',
+                  'edit_VideoModels','delete_VideoModels','manage_Quiz', 'create_Quiz', 'edit_Quiz', 'delete_Quiz'
+                  ]
         
 
         
@@ -58,7 +69,7 @@ class CourseForm(forms.ModelForm):
         
 class LessonForm(forms.ModelForm):
     class Meta:
-        model = Lessons
+        model = Lesson
         fields = ['course', 'name']
         widgets = {
             'course': forms.Select(attrs={'class': 'form-select'}),
@@ -196,7 +207,7 @@ class VideosForm(forms.ModelForm):
                 courses = Course.objects.filter(author=instructor)
                 if courses.exists():
                     self.fields['course'].queryset = courses
-                    lessons = Lessons.objects.filter(course__in = courses)
+                    lessons = Lesson.objects.filter(course__in = courses)
                     if lessons.exists():
                         self.fields['lesson'].queryset = lessons
                     else:
@@ -204,7 +215,7 @@ class VideosForm(forms.ModelForm):
                 else:
                     self.fields['course'].queryset = Course.objects.none()
                     self.fields['course'].empty_label = "No courses available"
-                    self.fields['lesson'].queryset = Lessons.objects.none()
+                    self.fields['lesson'].queryset = Lesson.objects.none()
                     self.fields['lesson'].empty_label = "Please add a course"
                     self.fields['title'].widget.attrs['placeholder'] = "Please add a course first"
                     
@@ -213,6 +224,88 @@ class VideosForm(forms.ModelForm):
                 # If the user is not an instructor, no courses are available
                 self.fields['course'].queryset = Course.objects.none()
                 self.fields['course'].empty_label = "No courses available"
-                self.fields['lesson'].queryset = Lessons.objects.none()
+                self.fields['lesson'].queryset = Lesson.objects.none()
                 self.fields['lesson'].empty_label = "Please add a course"
                 self.fields['title'].widget.attrs['placeholder'] =  'Author details not provided'
+                
+                
+
+class QuizForm(forms.ModelForm):
+    class Meta:
+        model = Quiz
+        fields = ['course', 'title']
+
+        widgets = {
+            'course': forms.Select(attrs={'class': 'form-select'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Quiz Title'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Extract the user passed during form initialization
+        super().__init__(*args, **kwargs)
+        if user:
+            try:
+                instructor = Instructor.objects.get(user=user)
+                courses = Course.objects.filter(author=instructor)
+                
+                # Filter out the selected course if in edit mode
+                if self.instance and self.instance.pk:
+                    # Ensure the current quiz's course is in the filtered queryset
+                    self.fields['course'].queryset = courses.filter(id=self.instance.course.id)
+                else:
+                    self.fields['course'].queryset = courses  # Limit courses to those authored by the instructor
+                
+                if not courses.exists():
+                    self.fields['course'].queryset = Course.objects.none()
+                    self.fields['course'].empty_label = "No courses available"
+                    self.fields['title'].widget.attrs['placeholder'] = "Please add a course first"
+            except Instructor.DoesNotExist:
+                self.fields['course'].queryset = Course.objects.none()
+                self.fields['course'].empty_label = "No courses available"
+                self.fields['title'].widget.attrs['placeholder'] = "Author details not provided"
+                
+                
+
+
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ['quiz', 'question_text', 'option_1', 'option_2', 'option_3', 'option_4', 'correct_option']
+
+        widgets = {
+            'quiz': forms.Select(attrs={'class': 'form-select'}),
+            'question_text': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Enter Question'
+            }),
+            'option_1': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Enter First Option'
+            }),
+            'option_2': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Enter Second Option'
+            }),
+            'option_3': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Enter Third Option'
+            }),
+            'option_4': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Enter Fourth Option'
+            }),
+            'correct_option': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        quiz = kwargs.pop('quiz', None)  # Extract the specific quiz passed
+        super().__init__(*args, **kwargs)
+        if quiz:
+            self.fields['quiz'].queryset = Quiz.objects.filter(id=quiz.id)  # Limit to the specific quiz
+        else:
+            self.fields['quiz'].queryset = Quiz.objects.none()  # Empty queryset if no quiz provided
+            self.fields['quiz'].empty_label = "No Quiz available"
+            
+            
+            
+

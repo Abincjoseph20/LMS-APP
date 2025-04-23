@@ -1,5 +1,6 @@
 from django.db import models
 from adminapp.models import Account  # Importing the Account model
+from teacher.models import Course
 
 class Student(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE, related_name="student_profile")
@@ -18,4 +19,19 @@ class Student_ProfilePermission(models.Model):
 
     def __str__(self):
         return f"{self.student.user.username} Profile Permissions"
+    
+
+class Categoriestheory(models.Model):
+    icon = models.CharField(max_length=200,null=True)
+    name = models.CharField(max_length=200)
+    title = models.CharField(max_length=500, default='default_value_here')
+    def __str__(self):
+        return self.name
+    
+    def get_all_theory(self):
+        return Theory.objects.all().order_by('id') # type: ignore
+
+
+
+
 

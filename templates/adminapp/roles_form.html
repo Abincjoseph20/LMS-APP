@@ -156,6 +156,12 @@
         .submit-btn:hover {
             background-color: #696cff;
         }
+        
+        /* Optional: Improve spacing between checkboxes */
+        .form-check {
+                margin-bottom: 8px;
+            }
+       
     </style>
 </head>
 <body>
@@ -212,65 +218,94 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Handle tab switching based on user role
-            const buttons = document.querySelectorAll('.nav-item');
-            const userRole = "{{ user.roles|lower }}"; // Get user role from Django and convert to lowercase
+            document.addEventListener("DOMContentLoaded", function () {
+        // [Keep your existing tab switching code here...]
 
-            // Set active class based on user role
-            buttons.forEach(button => {
-                if (button.dataset.role === userRole) {
-                    buttons.forEach(btn => btn.classList.remove('active')); // Remove active from all
-                    button.classList.add('active'); // Add active to matched role
-                }
-            });
+        // Enhanced checkbox functionality
+        const selectAllCheckbox = document.getElementById('select-all');
+        const moduleCheckboxes = document.querySelectorAll('.module-checkbox');
+        const permissionCheckboxes = document.querySelectorAll('.permission-checkbox');
 
-            // Handle manual tab switching when clicking buttons
-            buttons.forEach(button => {
-                button.addEventListener('click', () => {
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
+        // Handle "Select All" checkbox
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                const isChecked = this.checked;
+                moduleCheckboxes.forEach(moduleCheckbox => {
+                    moduleCheckbox.checked = isChecked;
+                    // Update all permissions in this module
+                    const row = moduleCheckbox.closest('tr');
+                    if (row) {
+                        row.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+                            checkbox.checked = isChecked;
+                        });
+                    }
                 });
             });
+        }
 
-            // Handle "Select All" checkbox functionality
-            const selectAllCheckbox = document.getElementById('select-all');
-            const moduleCheckboxes = document.querySelectorAll('.module-checkbox');
-
-            if (selectAllCheckbox) {
-                selectAllCheckbox.addEventListener('change', function () {
-                    moduleCheckboxes.forEach(moduleCheckbox => {
-                        moduleCheckbox.checked = this.checked;
-                        togglePermissions(moduleCheckbox);
-                    });
-                });
-            }
-
-            // Handle individual module checkbox clicks
-            moduleCheckboxes.forEach(moduleCheckbox => {
-                moduleCheckbox.addEventListener('change', function () {
-                    togglePermissions(this);
-                    updateSelectAllCheckbox();
-                });
-            });
-
-            // Function to toggle permissions when module checkbox is clicked
-            function togglePermissions(moduleCheckbox) {
-                const row = moduleCheckbox.closest('tr');
+        // Handle module checkbox clicks
+        moduleCheckboxes.forEach(moduleCheckbox => {
+            moduleCheckbox.addEventListener('change', function() {
+                const isChecked = this.checked;
+                // Update all permissions in this module
+                const row = this.closest('tr');
                 if (row) {
-                    const permissions = row.querySelectorAll('.permission-checkbox');
-                    permissions.forEach(permission => {
-                        permission.checked = moduleCheckbox.checked;
+                    row.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+                        checkbox.checked = isChecked;
                     });
                 }
-            }
-
-            // Update "Select All" checkbox state based on module checkboxes
-            function updateSelectAllCheckbox() {
-                const allChecked = Array.from(moduleCheckboxes).every(checkbox => checkbox.checked);
-                selectAllCheckbox.checked = allChecked;
-            }
+                updateSelectAllCheckbox();
+            });
         });
+
+        // Handle individual permission checkbox clicks
+        permissionCheckboxes.forEach(permissionCheckbox => {
+            permissionCheckbox.addEventListener('change', function() {
+                updateModuleCheckboxState(this);
+                updateSelectAllCheckbox();
+            });
+        });
+
+        // Update module checkbox state based on its permissions
+        function updateModuleCheckboxState(permissionCheckbox) {
+            const row = permissionCheckbox.closest('tr');
+            if (!row) return;
+            
+            const moduleCheckbox = row.querySelector('.module-checkbox');
+            const permissions = row.querySelectorAll('.permission-checkbox');
+            const checkedCount = Array.from(permissions).filter(p => p.checked).length;
+            
+            if (checkedCount === 0) {
+                moduleCheckbox.checked = false;
+                moduleCheckbox.indeterminate = false;
+            } else if (checkedCount === permissions.length) {
+                moduleCheckbox.checked = true;
+                moduleCheckbox.indeterminate = false;
+            } else {
+                moduleCheckbox.checked = false;
+                moduleCheckbox.indeterminate = true;
+            }
+        }
+
+        // Update "Select All" checkbox based on module states
+        function updateSelectAllCheckbox() {
+            if (!selectAllCheckbox || !moduleCheckboxes.length) return;
+            
+            const allChecked = Array.from(moduleCheckboxes).every(cb => cb.checked && !cb.indeterminate);
+            const anyChecked = Array.from(moduleCheckboxes).some(cb => cb.checked || cb.indeterminate);
+            
+            selectAllCheckbox.checked = allChecked;
+            selectAllCheckbox.indeterminate = !allChecked && anyChecked;
+        }
+
+        // Initialize all checkbox states on page load
+        function initializeCheckboxes() {
+            permissionCheckboxes.forEach(pb => updateModuleCheckboxState(pb));
+            updateSelectAllCheckbox();
+        }
+
+        initializeCheckboxes();
+    });
     </script>
 </body>
 

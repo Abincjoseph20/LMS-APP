@@ -2,12 +2,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import StudentProfilePermissionForm
-from .models import Student_ProfilePermission, Student
-from adminapp.models import Account
+from .models import Student_ProfilePermission, Student,Course
+from adminapp.models import Account,Payment
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from adminapp.models import Account
-from .models import Student, Student_ProfilePermission
+from .models import Student, Student_ProfilePermission,Categoriestheory
+from teacher.models import UserCourses,Categories,CourseResource
+from teacher.views import get_course_data
+from time import time
+
+
 
 
 def student_assign_permissions(request, user_id):
@@ -127,3 +132,132 @@ def profile_delete(request):
             return redirect('profile_view')
 
     return render(request, 'confirm_delete.html', {'user': user})
+
+
+def MY_COURSE(request):
+    if not request.user.is_authenticated:
+        return redirect('login_view')  
+
+    course = UserCourses.objects.filter(user=request.user)
+    category = Categories.objects.all().order_by('id')[:6]
+    theory = Categoriestheory.objects.all().order_by('id')[:6]
+    courser = CourseResource.get_all_category(CourseResource)
+
+    context = {
+        'course': course,
+        'category': category,
+        'theory': theory,
+        'courser': courser,
+    }
+    return render(request, 'student/course/my-course.html', context)
+
+
+
+def course_filter(request, category_id=None):
+    # Get all categories for the sidebar or menu
+    category = Categories.objects.all().order_by('id')[0:6]
+
+    # If a category ID is provided, filter courses by category
+    if category_id:
+        selected_category = get_object_or_404(Categories, id=category_id)
+        courses = Course.objects.filter(category=selected_category, status="PUBLISH")
+        print(f"Filtering by category {selected_category.name}, found {courses.count()} courses")
+    else:
+        # If no category is selected, display all published courses
+        courses = Course.objects.filter(status="PUBLISH")
+        selected_category = None
+        print(f"Showing all published courses, found {courses.count()} courses")
+    context = {
+        'category': category,
+        'courses': courses,
+        'selected_category': selected_category,
+    }
+    print(f"Number of courses found: {courses.count()}")
+    return render(request, 'student/course/course_filter.html',context)
+
+
+def course_detail(request, course_id):
+    course_data = get_course_data(course_id, request.user)   # another function, place just above
+    return render(request, 'student/course/courses-detail.html', course_data)
+
+
+
+def CHECKOUT(request, course_id):
+    # Get the course
+    course = Course.objects.get(pk=course_id)
+    action = request.GET.get('action')
+    order = None
+
+    # Check if the user is authenticated
+    if not request.user.is_authenticated:
+        # Redirect to the registration page
+        return redirect('registration/register')  # Replace 'registration_url' with your actual registration URL name
+
+    # If the course is free
+    if course.price == 0:
+        usercourse = UserCourses(
+            user=request.user,
+            course=course
+        )
+        usercourse.save()
+        messages.success(request, 'Course has successfully enrolled!')
+        return redirect('my_course')
+
+    # If action is to create payment
+    elif action == 'create_payment':
+        if request.method == "POST":
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            country = request.POST.get('country')
+            address = request.POST.get('address')
+            
+            city = request.POST.get('city')
+            state = request.POST.get('state')
+            postcode = request.POST.get('postcode')
+            phone = request.POST.get('phone')
+            email = request.POST.get('email')
+            order_comments = request.POST.get('order_comments')
+
+            amount = (course.price) * 100
+            currency = "INR"
+            notes = {
+                "name": f'{first_name} {last_name}',
+                "country": country,
+                "address": address,
+                "city": city,
+                "state": state,
+                "postcode": postcode,
+                "phone": phone,
+                "email": email,
+                "order_comments": order_comments,
+            }
+            receipt = f"Edu-{int(time())}"
+            order = client.order.create({
+                'receipt': receipt,
+                'amount': amount,
+                'currency': currency,
+                'notes': notes,
+            })
+
+            payment = Payment(
+                course=course,
+                user=request.user,
+                order_id=order.get('id')
+            )
+            payment.save()
+            
+            usercourse = UserCourses(
+                user=request.user,
+                course=course
+            )
+            usercourse.save()
+            messages.success(request, 'Course has successfully enrolled!')
+            return redirect('my_course')
+    context = {
+        'course': course,
+        'order': order,
+    }
+    
+    return render(request, 'adminapp/payment/chekout.html', context)
+
+

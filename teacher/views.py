@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import  Teacher,Teacher_ProfilePermission,Categories,Instructor,Levels,Language,Course,VideoModel,UserCourses,Lessons,CourseResource,What_u_learn,Requirements,VideoModels
+from .models import  Teacher,Teacher_ProfilePermission,Categories,Lesson,Instructor,Levels,Language,Course,VideoModel,UserCourses,CourseResource,What_u_learn,Requirements,VideoModels,Quiz,QuizResult,Certificate
 from adminapp.models import Account
-from .forms import Teacher_ProfilePermissionForm,CategoryForm,InstructorForm,LevelForm,LanguageForm,CourseForm,LessonForm,CourseResourceForm,WhatULearnForm,RequirementsForm,VideosForm
+from .forms import Teacher_ProfilePermissionForm,CategoryForm,InstructorForm,LevelForm,LanguageForm,CourseForm,LessonForm,CourseResourceForm,WhatULearnForm,RequirementsForm,VideosForm,QuizForm,QuestionForm
 from django.contrib.auth.decorators import login_required
 from .decorators import allowed_roles
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,6 +13,7 @@ from django.db.models.functions.mixins import (
     FixDurationInputMixin,
     NumericOutputFieldMixin,
 )
+from .models import Teacher, Teacher_ProfilePermission
 
 
 
@@ -25,10 +26,67 @@ def assign_teacher_permissions(request, user_id):
         if form.is_valid():
             permissions, created = Teacher_ProfilePermission.objects.get_or_create(teacher=teacher)
             
+            
             permissions.can_manage = form.cleaned_data['can_manage']
             permissions.can_create = form.cleaned_data['can_create']
             permissions.can_edit = form.cleaned_data['can_edit']
             permissions.can_delete = form.cleaned_data['can_delete']
+        
+            permissions.manage_categories = form.cleaned_data['manage_categories']
+            permissions.create_categories = form.cleaned_data['create_categories']
+            permissions.edit_categories = form.cleaned_data['edit_categories']
+            permissions.delete_categories = form.cleaned_data['delete_categories']
+            
+            permissions.manage_Instructor = form.cleaned_data['manage_Instructor']
+            permissions.create_Instructor = form.cleaned_data['create_Instructor']
+            permissions.edit_Instructor = form.cleaned_data['edit_Instructor']
+            permissions.delete_Instructor = form.cleaned_data['delete_Instructor']
+            
+            permissions.manage_Levels = form.cleaned_data['manage_Levels']
+            permissions.create_Levels = form.cleaned_data['create_Levels']
+            permissions.edit_Levels = form.cleaned_data['edit_Levels']
+            permissions.delete_Levels = form.cleaned_data['delete_Levels']
+            
+            permissions.manage_Language = form.cleaned_data['manage_Language']
+            permissions.create_Language = form.cleaned_data['create_Language']
+            permissions.edit_Language = form.cleaned_data['edit_Language']
+            permissions.delete_Language = form.cleaned_data['delete_Language']
+            
+            permissions.manage_Course = form.cleaned_data['manage_Course']
+            permissions.create_Course = form.cleaned_data['create_Course']
+            permissions.edit_Course = form.cleaned_data['edit_Course']
+            permissions.delete_Course = form.cleaned_data['delete_Course']
+            
+            permissions.manage_Lesson = form.cleaned_data['manage_Lesson']
+            permissions.create_Lesson = form.cleaned_data['create_Lesson']
+            permissions.edit_Lesson = form.cleaned_data['edit_Lesson']
+            permissions.delete_Lesson = form.cleaned_data['delete_Lesson']
+            
+            permissions.manage_CourseResource = form.cleaned_data['manage_CourseResource']
+            permissions.create_CourseResource = form.cleaned_data['create_CourseResource']
+            permissions.edit_CourseResource = form.cleaned_data['edit_CourseResource']
+            permissions.delete_CourseResource = form.cleaned_data['delete_CourseResource']
+            
+            permissions.manage_What_u_learn = form.cleaned_data['manage_What_u_learn']
+            permissions.create_What_u_learn = form.cleaned_data['create_What_u_learn']
+            permissions.edit_What_u_learn = form.cleaned_data['edit_What_u_learn']
+            permissions.delete_What_u_learn = form.cleaned_data['delete_What_u_learn']
+            
+            permissions.manage_Requirements = form.cleaned_data['manage_Requirements']
+            permissions.create_Requirements = form.cleaned_data['create_Requirements']
+            permissions.edit_Requirements = form.cleaned_data['edit_Requirements']
+            permissions.delete_Requirements = form.cleaned_data['delete_Requirements']
+            
+            permissions.manage_VideoModels = form.cleaned_data['manage_VideoModels']
+            permissions.create_VideoModels = form.cleaned_data['create_VideoModels']
+            permissions.edit_VideoModels = form.cleaned_data['edit_VideoModels']
+            permissions.delete_VideoModels = form.cleaned_data['delete_VideoModels']
+            
+            permissions.manage_Quiz = form.cleaned_data['manage_Quiz']
+            permissions.create_Quiz = form.cleaned_data['create_Quiz']
+            permissions.edit_Quiz = form.cleaned_data['edit_Quiz']
+            permissions.delete_Quiz = form.cleaned_data['delete_Quiz']
+
             permissions.save()
 
             messages.success(request, f"Permissions assigned successfully to {account.first_name} {account.last_name}.")
@@ -41,6 +99,8 @@ def assign_teacher_permissions(request, user_id):
 
     return render(request, 'teacher/teacher_roles_form.html', {'form': form, 'user': teacher})
 
+
+
 def teacher_success(request, user_id=None):
     teacher = None
     permissions = None
@@ -51,12 +111,121 @@ def teacher_success(request, user_id=None):
         permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
 
     return render(request, 'teacher/assign_permisssion.html', {
-        'user': teacher,
+        'teacher': teacher,
         'permissions': permissions
     })
 
 
 
+def edit_teacher_permissions(request, teacher_id):
+    teacher = get_object_or_404(Teacher, id=teacher_id)
+    modules = ['Category', 'Instructor', 'Level', 'Language', 'Course', 'Lesson', 'Course Resource', 'Learning Point', 'Requirement', 'Video', 'Quiz']
+
+    if request.method == 'POST':
+        for module in modules:
+            # Check if permission already exists, else create new
+            permission_obj, created = Teacher_ProfilePermission.objects.get_or_create(teacher=teacher)
+
+            # Update permissions based on checkbox values
+            permission_obj.can_manage = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.can_create = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.can_edit = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.can_delete = request.POST.get(f'{module}_delete') == 'on'
+            
+            permission_obj.manage_categories = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_categories = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_categories = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_categories = request.POST.get(f'{module}_delete') == 'on'
+            
+            
+            permission_obj.manage_Instructor = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_Instructor = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_Instructor = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_Instructor = request.POST.get(f'{module}_delete') == 'on'
+            
+            #_Levels
+            permission_obj.manage_Levels = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_Levels = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_Levels = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_Levels = request.POST.get(f'{module}_delete') == 'on'
+            
+            #_Language 
+            permission_obj.manage_Language  = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_Language  = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_Language  = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_Levels = request.POST.get(f'{module}_delete') == 'on'
+            
+            #_Course
+            permission_obj.manage_Course  = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_Course = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_Course  = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_Course = request.POST.get(f'{module}_delete') == 'on'
+            
+            #_Lesson
+            permission_obj.manage_Lesson = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_Lesson = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_Lesson  = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_Lesson = request.POST.get(f'{module}_delete') == 'on'
+            
+            #_CourseResource
+            permission_obj.manage_CourseResource = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_CourseResource = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_CourseResource  = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_CourseResource = request.POST.get(f'{module}_delete') == 'on'
+            
+            #CourseResource
+            permission_obj.manage_CourseResource = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_CourseResource = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_CourseResource  = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_CourseResource = request.POST.get(f'{module}_delete') == 'on'
+            
+            #_What_u_learn
+            permission_obj.manage_What_u_learn = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_What_u_learn = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_What_u_learn  = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_What_u_learn = request.POST.get(f'{module}_delete') == 'on'
+            
+            #_What_u_learn
+            permission_obj.manage_What_u_learn = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_What_u_learn = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_What_u_learn  = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_What_u_learn = request.POST.get(f'{module}_delete') == 'on'
+            
+            #_Requirements
+            permission_obj.manage_Requirements = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_Requirements = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_Requirements  = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_Requirements = request.POST.get(f'{module}_delete') == 'on'
+            
+            #_VideoModels 
+            permission_obj.manage_VideoModels  = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_VideoModels  = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_VideoModels   = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_VideoModels  = request.POST.get(f'{module}_delete') == 'on'
+            
+            #_Quiz 
+            permission_obj.manage_Quiz   = request.POST.get(f'{module}_manage') == 'on'
+            permission_obj.create_Quiz   = request.POST.get(f'{module}_create') == 'on'
+            permission_obj.edit_Quiz    = request.POST.get(f'{module}_edit') == 'on'
+            permission_obj.delete_Quiz   = request.POST.get(f'{module}_delete') == 'on'
+            
+            
+            
+            permission_obj.save()
+
+        return redirect('teacher_list')  # Or your redirect URL
+
+    # Prepare existing permissions for the form
+    # permissions = {}
+    # for module in modules:
+    permissions= Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+
+    context = {
+        'teacher': teacher,
+        'modules': modules,
+        'permissions': permissions,
+    }
+    return render(request, 'teacher/edit_teacher_permissions.html', context)
 
 
 @login_required
@@ -121,6 +290,16 @@ def profile_delete(request):
 @login_required
 @allowed_roles(['admin_and_instructor'])
 def add_category(request):
+    
+    user = request.user
+    
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_categories:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
         form = CategoryForm(request.POST, request.FILES)  # Include request.FILES
         if form.is_valid():
@@ -136,7 +315,7 @@ def add_category(request):
     else:
         form = CategoryForm()
         if request.user.roles == 'Teacher':
-            template_name = 'teacher/add_category.html'
+            template_name = 'teacher/category/add_category.html'
         else:
             template_name = 'admin/add_category.html'
             
@@ -147,9 +326,18 @@ def add_category(request):
 @login_required
 @allowed_roles(['admin_and_instructor'])   #for restricting student
 def category_list(request):
+    user = request.user
+    
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_categories:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     categories = Categories.objects.all()
     if request.user.roles == 'Teacher':
-        template_name = 'teacher/category_list.html'
+        template_name = 'teacher/category/category_list.html'
     else:
         template_name = 'admin/category_list.html'
     
@@ -160,6 +348,16 @@ def category_list(request):
 @allowed_roles(['admin_and_instructor'])
 def update_category(request, category_id):
     category = get_object_or_404(Categories, id=category_id)  # Fetch the category object
+    
+    user = request.user
+    
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_categories:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
         # Initialize the form with POST data, FILES, and bind it to the category instance
         form = CategoryForm(request.POST, request.FILES, instance=category)
@@ -171,23 +369,43 @@ def update_category(request, category_id):
         # Pre-fill the form with the current category instance
         form = CategoryForm(instance=category)
         if request.user.roles == 'Teacher':
-            template_name = 'teacher/update_category.html'
+            template_name = 'teacher/category/update_category.html'
         else:
             template_name = 'admin/update_category.html'
     return render(request, template_name, {'form': form, 'category': category})
 
 
 def delete_category(request, category_id):
+        
+    user = request.user
+    
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_categories:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     category = get_object_or_404(Categories, id=category_id)
     category.delete()
     messages.success(request, "Category deleted successfully!")
     return redirect('category_list')
 
 
+# create_instructor
 
 
 @login_required
 def create_instructor(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_Instructor:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
         # Check if the logged-in user already has an Instructor profile
         if Instructor.objects.filter(user=request.user).exists():
@@ -207,11 +425,12 @@ def create_instructor(request):
     else:
         form = InstructorForm()
 
-    return render(request, 'teacher/teacher_form.html', {'form': form})
+    return render(request, 'teacher/instructor/teacher_form.html', {'form': form})
 
 class InstructorListView(LoginRequiredMixin, ListView):
+    
     model = Instructor
-    template_name = 'teacher/teacher_details.html'
+    template_name = 'teacher/instructor/teacher_details.html'
     context_object_name = 'instructor'
     paginate_by = 10
 
@@ -224,6 +443,15 @@ class InstructorListView(LoginRequiredMixin, ListView):
 def update_instructor(request):
     # Fetch the instructor profile of the logged-in user
     instructor = get_object_or_404(Instructor, user=request.user)
+    
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_Instructor:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
 
     if request.method == 'POST':
         form = InstructorForm(request.POST, request.FILES, instance=instructor)
@@ -236,13 +464,22 @@ def update_instructor(request):
     else:
         form = InstructorForm(instance=instructor)
 
-    return render(request, 'teacher/update_teacher.html', {'form': form})
+    return render(request, 'teacher/instructor/update_teacher.html', {'form': form})
 
 
 @login_required
 def delete_instructor(request):
     # Fetch the instructor profile of the logged-in user
     instructor = get_object_or_404(Instructor, user=request.user)
+    
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_Instructor:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
     
     instructor.delete()
     messages.success(request, "Instructor profile deleted successfully!")
@@ -254,11 +491,29 @@ def delete_instructor(request):
 
 
 def level_list(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_Levels:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     levels = Levels.objects.all()
-    return render(request, 'teacher/level_list.html', {'levels': levels})
+    return render(request, 'teacher/level/level_list.html', {'levels': levels})
 
 # Add new Level
 def add_level(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_Levels:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == "POST":
         form = LevelForm(request.POST)
         if form.is_valid():
@@ -266,11 +521,20 @@ def add_level(request):
             return redirect('level_list')
     else:
         form = LevelForm()
-    return render(request, 'teacher/add_level.html', {'form': form})
+    return render(request, 'teacher/level/add_level.html', {'form': form})
 
 
 # Update Level
 def update_level(request, pk):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_Levels:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     level = get_object_or_404(Levels, pk=pk)
     if request.method == "POST":
         form = LevelForm(request.POST, instance=level)
@@ -279,21 +543,36 @@ def update_level(request, pk):
             return redirect('level_list')
     else:
         form = LevelForm(instance=level)
-    return render(request, 'teacher/update_level.html', {'form': form})
+    return render(request, 'teacher/level/update_level.html', {'form': form})
 
 
 def delete_level(request, pk):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_Levels:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     level = get_object_or_404(Levels, pk=pk)
     level.delete()
     messages.success(request, "Category deleted successfully!")
     return redirect('level_list')
 
 
-
-
-
 # Add new Level
 def add_language(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_Language:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == "POST":
         form = LanguageForm(request.POST)
         if form.is_valid():
@@ -301,14 +580,32 @@ def add_language(request):
             return redirect('language_list')
     else:
         form = LanguageForm()
-    return render(request, 'teacher/add_language.html', {'form': form})
+    return render(request, 'teacher/language/add_language.html', {'form': form})
 
 def language_list(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_Language:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     language = Language.objects.all()
-    return render(request, 'teacher/language_list.html', {'language': language})
+    return render(request, 'teacher/language/language_list.html', {'language': language})
 
 
 def update_language(request, pk):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_Language:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     language = get_object_or_404(Language, pk=pk)
     if request.method == "POST":
         form = LanguageForm(request.POST, instance=language)
@@ -317,10 +614,19 @@ def update_language(request, pk):
             return redirect('language_list')
     else:
         form = LanguageForm(instance=language)
-    return render(request, 'teacher/update_language.html', {'form': form})
+    return render(request, 'teacher/language/update_language.html', {'form': form})
 
 
 def delete_language(request, pk):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_Language:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     level = get_object_or_404(Language, pk=pk)
     level.delete()
     messages.success(request, "Category deleted successfully!")
@@ -497,6 +803,16 @@ class Aggregate(Func):
 
 @login_required
 def add_course(request):
+    
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_Course:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
         form = CourseForm(request.POST, request.FILES, user=request.user)  # Pass user to the form
         if form.is_valid():
@@ -515,13 +831,21 @@ def add_course(request):
         form = CourseForm(user=request.user)  # Pass user to the form
     
     instructor = Instructor.objects.filter(user=request.user).first()
-    return render(request, 'teacher/add_course.html', {'form': form, 'instructor': instructor})
+    return render(request, 'teacher/course/add_course.html', {'form': form, 'instructor': instructor})
 
 @login_required
 def course_list(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_Course:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
     # Filter courses where the author is the currently logged-in user
     courses = Course.objects.filter(author__user=request.user)
-    return render(request, 'teacher/course_list.html', {'courses': courses})
+    return render(request, 'teacher/course/course_list.html', {'courses': courses})
 
 class Sum(FixDurationInputMixin, Aggregate):
     function = "SUM"
@@ -557,11 +881,29 @@ def get_course_data(course_id, user=None):
 
 
 def course_detail(request, course_id):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_Course:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     course_data = get_course_data(course_id, request.user)   # another function, place just above
-    return render(request, 'teacher/course-details.html', course_data)
+    return render(request, 'teacher/course/course-details.html', course_data)
 
 @login_required
 def update_course(request, course_id):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_Course:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     course = get_object_or_404(Course, id=course_id)
     if request.method == 'POST':
         form = CourseForm(request.POST, request.FILES, instance=course)
@@ -573,10 +915,19 @@ def update_course(request, course_id):
         form = CourseForm(instance=course)
         # print(course.author)
         # print(form)
-    return render(request, 'teacher/update_coruse.html', {'form': form,'course':course})
+    return render(request, 'teacher/course/update_coruse.html', {'form': form,'course':course})
 
 @login_required
 def delete_course(request, course_id):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_Course:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     course = get_object_or_404(Course, id=course_id)
     if request.method == 'POST':
         course.delete()
@@ -590,6 +941,14 @@ def delete_course(request, course_id):
 # Add a lesson
 @login_required
 def add_lesson(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_Lesson:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
     if request.method == 'POST':
         form = LessonForm(request.POST)
         if form.is_valid():
@@ -598,23 +957,41 @@ def add_lesson(request):
             return redirect('lesson_list')
     else:
         form = LessonForm(user = request.user)
-    return render(request, 'teacher/add_lesson.html', {'form': form})
+    return render(request, 'teacher/lesson/add_lesson.html', {'form': form})
 
 # Display all lessons
 @login_required
 def lesson_list(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_Lesson:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     try:
         auther = Instructor.objects.get( user = request.user)
         my_course = Course.objects.filter(author = auther)
-        lessons = Lessons.objects.filter(course__in= my_course)
-        return render(request, 'teacher/lesson_list.html', {'lessons': lessons})
+        lessons = Lesson.objects.filter(course__in= my_course)
+        return render(request, 'teacher/lesson/lesson_list.html', {'lessons': lessons})
     except:
-        return render(request, 'teacher/lesson_list.html')
+        return render(request, 'teacher/lesson/lesson_list.html')
     
 
 # Update a lesson
 def update_lesson(request, lesson_id):
-    lesson = get_object_or_404(Lessons, id=lesson_id)
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_Lesson:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
+    lesson = get_object_or_404(Lesson, id=lesson_id)
     if request.method == 'POST':
         form = LessonForm(request.POST, instance=lesson)
         if form.is_valid():
@@ -623,21 +1000,37 @@ def update_lesson(request, lesson_id):
             return redirect('lesson_list')
     else:
         form = LessonForm(instance=lesson, user = request.user)
-    return render(request, 'teacher/update_lesson.html', {'form': form})
+    return render(request, 'teacher/lesson/update_lesson.html', {'form': form})
 
 # Delete a lesson
 def delete_lesson(request, lesson_id):
-    lesson = get_object_or_404(Lessons, id=lesson_id)
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_Lesson:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
+    lesson = get_object_or_404(Lesson, id=lesson_id)
     if request.method == 'POST':
         lesson.delete()
         messages.success(request, "Lesson deleted successfully!")
     return redirect('lesson_list')
 
 
-
-
 # START Course Resources
 def add_course_resource(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_CourseResource:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
         form = CourseResourceForm(request.POST, request.FILES)
         if form.is_valid():
@@ -646,10 +1039,19 @@ def add_course_resource(request):
             return redirect('resource_list')
     else:
         form = CourseResourceForm(user = request.user)
-    return render(request, 'teacher/add_resource.html', {'form': form})
+    return render(request, 'teacher/course_resource/add_resource.html', {'form': form})
 
 
 def resource_list(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_CourseResource:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     try:
         auther = Instructor.objects.get( user = request.user)
         my_courses = Course.objects.filter(author = auther)
@@ -657,10 +1059,19 @@ def resource_list(request):
         context = {'resources' : resource}
     except:
         context = {'resources' : None}
-    return render(request, 'teacher/resource_list.html', context)
+    return render(request, 'teacher/course_resource/resource_list.html', context)
 
 @login_required
 def update_course_resource(request, resource_id):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_CourseResource:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     resource = get_object_or_404(CourseResource, id=resource_id)
     if request.method == 'POST':
         form = CourseResourceForm(request.POST, request.FILES, instance=resource)
@@ -670,10 +1081,20 @@ def update_course_resource(request, resource_id):
             return redirect('resource_list')
     else:
         form = CourseResourceForm(instance=resource, user = request.user)
-    return render(request, 'teacher/update_resource.html', {'form': form})
+    return render(request, 'teacher/course_resource/update_resource.html', {'form': form})
 
 @login_required
 def delete_course_resource(request, resource_id):
+    
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_CourseResource:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     resource = get_object_or_404(CourseResource, id=resource_id)
     resource.delete()
     messages.success(request, "Resource deleted successfully!")
@@ -684,6 +1105,15 @@ def delete_course_resource(request, resource_id):
 #what u learn
 
 def add_what_u_learn(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_What_u_learn:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
         form = WhatULearnForm(request.POST)
         if form.is_valid():
@@ -692,15 +1122,33 @@ def add_what_u_learn(request):
             return redirect('what_u_learn_list')
     else:
         form = WhatULearnForm()
-    return render(request, 'teacher/add_what_u_learn.html', {'form': form})
+    return render(request, 'teacher/what_u_learn/add_what_u_learn.html', {'form': form})
 
 
 def what_u_learn_list(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_What_u_learn:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     what_u_learn_entries = What_u_learn.objects.all()
-    return render(request, 'teacher/what_u_learn_list.html', {'what_u_learn_entries': what_u_learn_entries})
+    return render(request, 'teacher/what_u_learn/what_u_learn_list.html', {'what_u_learn_entries': what_u_learn_entries})
 
 
 def update_what_u_learn(request, entry_id):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_What_u_learn:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     entry = get_object_or_404(What_u_learn, id=entry_id)
     if request.method == 'POST':
         form = WhatULearnForm(request.POST, instance=entry)
@@ -710,10 +1158,19 @@ def update_what_u_learn(request, entry_id):
             return redirect('what_u_learn_list')
     else:
         form = WhatULearnForm(instance=entry)
-    return render(request, 'teacher/update_what_u_learn.html', {'form': form})
+    return render(request, 'teacher/what_u_learn/update_what_u_learn.html', {'form': form})
 
 
 def delete_what_u_learn(request, entry_id):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_What_u_learn:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
         entry = get_object_or_404(What_u_learn, id=entry_id)
         entry.delete()
@@ -724,6 +1181,15 @@ def delete_what_u_learn(request, entry_id):
 
 
 def add_requirement(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_Requirements:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
         form = RequirementsForm(request.POST)
         if form.is_valid():
@@ -732,9 +1198,19 @@ def add_requirement(request):
             return redirect('requirement_list')
     else:
         form = RequirementsForm(user = request.user)
-    return render(request, 'teacher/add_requirement.html', {'form': form})
+    return render(request, 'teacher/requirement/add_requirement.html', {'form': form})
 
 def requirement_list(request):
+    
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_Requirements:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     try:
         auther = Instructor.objects.get( user = request.user)
         my_courses = Course.objects.filter(author = auther)
@@ -742,10 +1218,19 @@ def requirement_list(request):
         context = {'requirements' : requirement}
     except:
         context = {'requirements' : None}
-    return render(request, 'teacher/requirement_list.html', context)
+    return render(request, 'teacher/requirement/requirement_list.html', context)
 
 def update_requirement(request, requirement_id):
     requirement = get_object_or_404(Requirements, id=requirement_id)
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_Requirements:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
         form = RequirementsForm(request.POST, instance=requirement)
         if form.is_valid():
@@ -754,9 +1239,18 @@ def update_requirement(request, requirement_id):
             return redirect('requirement_list')
     else:
         form = RequirementsForm(instance=requirement, user = request.user)
-    return render(request, 'teacher/update_requirement.html', {'form': form})
+    return render(request, 'teacher/requirement/update_requirement.html', {'form': form})
 
 def delete_requirement(request, requirement_id):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_Requirements:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     requirement = get_object_or_404(Requirements, id=requirement_id)
     if request.method == 'POST':
         requirement.delete()
@@ -768,44 +1262,227 @@ def delete_requirement(request, requirement_id):
 
 # Create a video
 def create_video(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_VideoModels:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
-        form = VideosForm(request.POST, request.FILES)
+        form = VideosForm(request.POST, request.FILES,user=request.user )
         if form.is_valid():
             form.save()
             messages.success(request, "Video added successfully!")
             return redirect('view_video')
     else:
+        print('video not added')
         form = VideosForm(user = request.user)
-    return render(request, 'teacher/create_video.html', {'form': form})
+    return render(request, 'teacher/video/create_video.html', {'form': form})
 
 # list a video
 def view_video(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_VideoModels:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
     try:
         auther = Instructor.objects.get( user = request.user)
+        print("Instructor:", auther)
         my_course = Course.objects.filter(author = auther)
-        videos = VideoModel.objects.filter(course__in = my_course)
+        print("Courses for instructor:", my_course)
+        videos = VideoModels.objects.filter(course__in = my_course)
+        print("Videos for courses:", videos)
         context = {'videos' : videos}
     except:
         context = {'videos' : None}
-    return render(request, 'teacher/view_video.html', context)
+        print("No instructor found or error in fetching videos")
+    return render(request, 'teacher/video/view_video.html', context)
 
 # update a video
 def video_update(request, video_id):
-    video = get_object_or_404(VideoModel, id=video_id)
+    video = get_object_or_404(VideoModels, id=video_id)
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_VideoModels:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
-        form = VideosForm(request.POST, request.FILES, instance=video)
+        form = VideosForm(request.POST, request.FILES, instance=video,user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, "Video updated successfully!")
             return redirect('view_video')
     else:
         form = VideosForm(instance=video, user = request.user)
-    return render(request, 'teacher/video_update.html', {'form': form})
+    return render(request, 'teacher/video/video_update.html', {'form': form})
 
 # Delete a video
 def delete_videos(request, video_id):
-    video = get_object_or_404(VideoModel, id=video_id)
+    video = get_object_or_404(VideoModels, id=video_id)
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_VideoModels:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
     if request.method == 'POST':
-        VideoModel.delete()
+        video.delete()
         messages.success(request, "Video deleted successfully!")
-    return redirect('video_list')
+    return redirect('view_video')
+
+#quez
+def create_quiz(request):
+    # course = get_object_or_404(Course, id=course_id)
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_Quiz:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
+    if request.method == 'POST':
+        quiz_form = QuizForm(request.POST)
+        if quiz_form.is_valid():
+            quiz = quiz_form.save()  # Save the quiz instance
+            return redirect('add_questions', quiz_id=quiz.id)  # Redirect to the page to add questions
+    else:
+        quiz_form = QuizForm(user = request.user)
+    return render(request, 'teacher/quiz/create_quiz.html', {'quiz_form': quiz_form})
+
+
+def add_questions(request, quiz_id):
+    quiz = get_object_or_404(Quiz,id=quiz_id)
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_Quiz:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
+    if request.method == 'POST':
+        question_form = QuestionForm(request.POST, quiz=quiz)  # Pass quiz to the form
+        if question_form.is_valid():
+            question = question_form.save(commit=False)
+            question.quiz = quiz  # Explicitly set the quiz for the question
+            question.save()
+            return redirect('add_questions', quiz_id=quiz.id)  # Redirect to add another question or finish
+    else:
+        question_form = QuestionForm(initial={'quiz': quiz}, quiz=quiz)  # Pre-fill the quiz field and limit queryset    
+    return render(request, 'teacher/quiz/add_questions.html', {'question_form': question_form, 'quiz': quiz})
+
+
+def list_quiz(request):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_Quiz:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
+    try:
+        auther = Instructor.objects.get( user = request.user)
+        my_courses = Course.objects.filter(author = auther)
+        quizzes = Quiz.objects.filter(course__in= my_courses)
+        
+        
+        context = {'quizzes' : quizzes}
+    except:
+        context = {'quizzes' : None}
+    
+    
+    return render(request, 'teacher/quiz/list_quiz.html', context)
+
+def delete_quiz(request,quiz_id):
+    
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.delete_Quiz:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
+    quiz = get_object_or_404(Quiz,id=quiz_id)
+    quiz.delete()
+    messages.success(request, "Quiz deleted successfully!")
+    return redirect('list_quiz')
+
+def edit_quiz(request,quiz_id):
+    quiz = get_object_or_404(Quiz,id=quiz_id)
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.edit_Quiz:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
+    if request.method == 'POST':
+        quiz_form = QuizForm(request.POST, instance = quiz )
+        if quiz_form.is_valid():
+            quiz_form.save()
+            messages.success(request, "Quiz edited successfully!")
+            return redirect('add_questions', quiz_id=quiz.id)
+    else:
+        quiz_form = QuizForm( instance = quiz, user = request.user )
+    return render(request, 'teacher/quiz/edit_quiz.html', {'quiz_form':quiz_form} )
+
+
+
+
+def get_quiz_results_for_course(request, quiz_id):
+    # Step 1: Get the quiz for the given course (assuming there's one quiz per course)
+    quiz = get_object_or_404(Quiz, id=quiz_id) 
+    
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.manage_Quiz:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
+    quiz_results = QuizResult.objects.filter(quiz=quiz).select_related('quiz')
+
+    return render(request, 'teacher/quiz/quiz_results.html', {'quiz_results':quiz_results} )
+
+def verify_result(request, quiz_result_id):
+    user = request.user
+
+    teacher = get_object_or_404(Teacher, user=user)
+    permissions = Teacher_ProfilePermission.objects.filter(teacher=teacher).first()
+    
+    if not permissions or not permissions.create_Language:
+        messages.error(request, "You do not have permission to delete this profile.")
+        return redirect('profile_view')
+    
+    quiz_result = get_object_or_404(QuizResult, id=quiz_result_id)
+    certificate_obj, created =  Certificate.objects.get_or_create(
+                quiz_result = quiz_result,
+                verified = True,
+            )
+    print('reached')
+    return redirect('quiz_results', quiz_id = quiz_result.quiz.id)

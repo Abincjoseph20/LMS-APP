@@ -6,6 +6,9 @@ urlpatterns = [
 
     path('teacher/assign_permissions/<int:user_id>/', views.assign_teacher_permissions, name='assign_teacher_permissions'),
     path('teacher/success_page/<int:user_id>/', views.teacher_success, name='teacher_success_page'),
+    path('edit-teacher-permissions/<int:teacher_id>/', views.edit_teacher_permissions, name='edit_teacher_permissions'),
+    # urls.py
+    path('edit-teacher-permissions/<int:teacher_id>/', views.edit_teacher_permissions, name='edit_teacher_permissions'),
     
     path('profile/edit/', views.profile_edit, name='teacher_profile_edit'),
     path('profile/delete/', views.profile_delete, name='teacher_profile_delete'),
@@ -79,4 +82,18 @@ urlpatterns = [
     path('view_video',views.view_video, name='view_video'),
     path('video_update/<int:video_id>/',views.video_update, name='video_update'),
     path('delete_videos/<int:video_id>/', views.delete_videos, name='delete_videos'),
+    
+    
+    # quiz crud
+    path('create_quiz/', views.create_quiz, name='create_quiz'),
+    path('quiz/<int:quiz_id>/add_questions/', views.add_questions, name='add_questions'),
+    path('list_quiz/', views.list_quiz, name='list_quiz'),
+    path('delete_quiz/<int:quiz_id>', views.delete_quiz, name='delete_quiz'),
+    path('edit_quiz/<int:quiz_id>', views.edit_quiz, name='edit_quiz'),
+    
+    
+    # quiz results
+    path('quiz_results/<int:quiz_id>', views.get_quiz_results_for_course, name='quiz_results'),
+    path('verify_result/<int:quiz_result_id>', views.verify_result, name='verify_result'),
+
 ]
