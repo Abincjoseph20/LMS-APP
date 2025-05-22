@@ -59,55 +59,50 @@
             </div> <!-- row -->
             <div class="row course-slied mt-20">
                 <!-- Loop through each course dynamically -->
-                {% for enrollment in enrolled_courses %}
                 <div class="col-lg-4">
                     <div class="singel-course">
                         <div class="thum">
                             <div class="image fixed-height">
-                                <!-- Display course featured image with fixed height class -->
-                                <img src="{{ enrollment.course.featured_image.url }}" alt="{{ enrollment.course.title }}">
+                                <img src="{{ course.featured_image.url }}" alt="{{ course.title }}">
                             </div>
                             <div class="price">
-                                <span>{% if enrollment.course.is_free %}Free{% else %}${{ course.price }}{% endif %}</span>
+                                <span>{% if course.is_free %}Free{% else %}${{ course.price }}{% endif %}</span>
                             </div>
                         </div>
                         <div class="cont">
-                            <!-- <div> -->
-                                <ul>
-                                    <li><i class="fa fa-star"></i></li>
-                                    <li><i class="fa fa-star"></i></li>
-                                    <li><i class="fa fa-star"></i></li>
-                                    <li><i class="fa fa-star"></i></li>
-                                    <li><i class="fa fa-star"></i></li>
-                                </ul>
-                                <span>(20 Reviews)</span>
-                            <!-- </div> -->
+                            <ul>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                            </ul>
+                            <span>(20 Reviews)</span>
                             <div style="max-width: 100%; width: 100%; overflow: hidden;">
-                                <a href="{% url 'course_detail' enrollment.course.id  %}" style="display: block;">
+                                <a href="{% url 'course_detail' course.id  %}" style="display: block;">
                                     <h4 style="margin: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-                                        {{ enrollment.course.title }}
+                                        {{ course.title }}
                                     </h4>
                                 </a>
                             </div>
-                        
                             <div class="course-teacher">
                                 <div class="thum">
-                                    <a href="{% url 'teachers_details' enrollment.course.author.user.id  %}"><img src="{{enrollment.course.author.user.profile_image.url}}" alt="teacher"></a>
+                                    <a href="#"><img src="#" alt="teacher"></a>
                                 </div>
                                 <div class="name">
-                                    <a href="{% url 'teachers_details' enrollment.course.author.user.id  %}"><h6>{{ enrollment.course.author.user.username  }}</h6></a>
+                                    <a href="3"><h6>demo</h6></a>
                                 </div>
                                 <div class="admin">
                                     <ul>
-                                        <li><a href="{% url 'course_detail' enrollment.course.id  %}"><i class="fa fa-user"></i><span>31</span></a></li>
-                                        <li><a href="{% url 'course_detail' enrollment.course.id  %}"><i class="fa fa-heart"></i><span>10</span></a></li>
+                                        <li><a href="{% url 'course_detail' course.id  %}"><i class="fa fa-user"></i><span>31</span></a></li>
+                                        <li><a href="{% url 'course_detail' course.id  %}"><i class="fa fa-heart"></i><span>10</span></a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                     </div> <!-- singel course -->
                 </div>
-                {% endfor %}
+                
             </div> <!-- course slied -->
         </div> <!-- container -->
     </section>
@@ -120,5 +115,8 @@
             border-radius: 5px; /* Optional: for rounded corners */
         }
     </style>
+    
+
+
 
 {% endblock %}

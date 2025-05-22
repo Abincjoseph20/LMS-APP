@@ -209,6 +209,8 @@ class UserCourses(models.Model):
         course_title = getattr(self.course, 'title', 'No Title')
         return f"{user_name} - {course_title}"
     
+    
+    
 # class Payment(models.Model):
 #     user=models.ForeignKey(Account,on_delete=models.CASCADE)
 #     course=models.ForeignKey(Course,on_delete=models.CASCADE,null=True)

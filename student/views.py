@@ -2,18 +2,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import StudentProfilePermissionForm
-from .models import Student_ProfilePermission, Student,Course
+from .models import Student_ProfilePermission,Student
 from adminapp.models import Account,Payment
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from adminapp.models import Account
 from .models import Student, Student_ProfilePermission,Categoriestheory
-from teacher.models import UserCourses,Categories,CourseResource
-from teacher.views import get_course_data
+from teacher.models import UserCourses,Categories,CourseResource,Course
+from teacher.views import get_course_data,get_top_instructors
 from time import time
-
-
-
+from django.db import transaction  
+from teacher.models import Instructor
 
 def student_assign_permissions(request, user_id):
     account = get_object_or_404(Account, id=user_id)  # Get the student by Account model
@@ -134,46 +133,23 @@ def profile_delete(request):
     return render(request, 'confirm_delete.html', {'user': user})
 
 
-def MY_COURSE(request):
-    if not request.user.is_authenticated:
-        return redirect('login_view')  
-
-    course = UserCourses.objects.filter(user=request.user)
-    category = Categories.objects.all().order_by('id')[:6]
-    theory = Categoriestheory.objects.all().order_by('id')[:6]
-    courser = CourseResource.get_all_category(CourseResource)
-
-    context = {
-        'course': course,
-        'category': category,
-        'theory': theory,
-        'courser': courser,
-    }
-    return render(request, 'student/course/my-course.html', context)
-
-
-
 def course_filter(request, category_id=None):
-    # Get all categories for the sidebar or menu
-    category = Categories.objects.all().order_by('id')[0:6]
-
-    # If a category ID is provided, filter courses by category
+    print("Category ID:", category_id)  # Debug
+    categories = Categories.objects.all().order_by('id')[:6]
+    courses = Course.objects.filter(status="PUBLISH")
+    
     if category_id:
         selected_category = get_object_or_404(Categories, id=category_id)
-        courses = Course.objects.filter(category=selected_category, status="PUBLISH")
-        print(f"Filtering by category {selected_category.name}, found {courses.count()} courses")
-    else:
-        # If no category is selected, display all published courses
-        courses = Course.objects.filter(status="PUBLISH")
-        selected_category = None
-        print(f"Showing all published courses, found {courses.count()} courses")
+        courses = courses.filter(category=selected_category)
+        print("Filtered Courses Count:", courses.count())  # Debug
+    
     context = {
-        'category': category,
+        'category': categories,
         'courses': courses,
-        'selected_category': selected_category,
+        'selected_category': selected_category if category_id else None,
     }
-    print(f"Number of courses found: {courses.count()}")
-    return render(request, 'student/course/course_filter.html',context)
+    return render(request, 'student/course/course_filter.html', context)
+
 
 
 def course_detail(request, course_id):
@@ -191,7 +167,7 @@ def CHECKOUT(request, course_id):
     # Check if the user is authenticated
     if not request.user.is_authenticated:
         # Redirect to the registration page
-        return redirect('registration/register')  # Replace 'registration_url' with your actual registration URL name
+        return redirect('accounts/register')  # Replace 'registration_url' with your actual registration URL name
 
     # If the course is free
     if course.price == 0:
@@ -245,19 +221,85 @@ def CHECKOUT(request, course_id):
                 order_id=order.get('id')
             )
             payment.save()
-            
-            usercourse = UserCourses(
-                user=request.user,
-                course=course
-            )
-            usercourse.save()
-            messages.success(request, 'Course has successfully enrolled!')
-            return redirect('my_course')
+
     context = {
         'course': course,
         'order': order,
     }
     
-    return render(request, 'adminapp/payment/chekout.html', context)
+    return render(request, 'student/payment/checkout.html', context)
 
 
+def MY_COURSE(request):
+    if not request.user.is_authenticated:
+        return redirect('login')  
+
+    enrolled_courses = UserCourses.objects.filter(user=request.user)
+    category = Categories.objects.all().order_by('id')[:6]
+    theory = Categoriestheory.objects.all().order_by('id')[:6]
+    courser = CourseResource.get_all_category(CourseResource)
+
+    context = {
+        'enrolled_courses': enrolled_courses,
+        'category': category,
+        'theory': theory,
+        'courser': courser,
+    }
+    print(enrolled_courses,category,theory,courser)
+    
+    return render(request, 'student/course/my-course.html', context)
+
+
+def index(request):
+    category=Categories.objects.all().order_by('id')[0:6]
+    theory=Categoriestheory.objects.all().order_by('id')[0:6]
+    course=Course.objects.filter(status='PUBLISH').order_by('-id')
+    courser=CourseResource.get_all_category(CourseResource)
+    
+    top_teachers = get_top_instructors
+
+    context={
+        'category':category,
+        'course':course,
+        'theory':theory,
+        'courser':courser, 
+        'top_teachers':top_teachers,
+    }
+    return render(request,'index.html',context)
+
+
+def enroll_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    
+    # Check if already enrolled
+    is_enrolled = UserCourses.objects.filter(user=request.user, course=course).exists()
+    if not is_enrolled:
+        UserCourses.objects.create(user=request.user, course=course, paid=True)  # Or paid=False as needed
+
+    return redirect('my_course')
+
+
+def teachers_details(request, teacher_id):
+    category=Categories.get_all_category(Categories).order_by('id')[0:6]
+
+
+    teacher = get_object_or_404(Account,id = teacher_id)
+    try:
+        instructor = Instructor.objects.get(user = teacher)
+        my_courses = Course.objects.filter(author = instructor)
+        context={
+            'category':category,
+            'teacher':teacher,
+            'instructor':instructor,
+            'my_courses':my_courses
+            }
+    except:
+
+        context={
+            'category':category,
+            'teacher':teacher,
+            'instructor':None,
+            'courses':None
+            }
+    
+    return render(request,'teachers-details.html',context)

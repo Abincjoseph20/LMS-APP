@@ -1,6 +1,6 @@
 from django.db import models
 from adminapp.models import Account  # Importing the Account model
-from teacher.models import Course
+# from teacher.models import Courses
 
 class Student(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE, related_name="student_profile")
@@ -30,8 +30,4 @@ class Categoriestheory(models.Model):
     
     def get_all_theory(self):
         return Theory.objects.all().order_by('id') # type: ignore
-
-
-
-
 

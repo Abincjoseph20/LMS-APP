@@ -405,10 +405,7 @@
                                     <li><i class="fa fa-user-o"></i>Certificates :  <span>{{course.Certificate}}</span></li>
                                     <li><i class="fa fa-user-o"></i>Entrolled Students :  <span>{{course.usercourse_set.all.count}} </span></li>
                                 </ul>
-                                {% comment %} <div class="price-button pt-10">
-                                    <span>Price : <b>$25</b></span>
-                                    <a href="#" class="main-btn">Enroll Now</a>
-                                </div>  {% endcomment %}
+       
                                 <div class="price-button pt-10">
                                     {% if course.price == 0 %}
                                         <span>Price : <b>Free</b></span>
@@ -422,7 +419,7 @@
                                     
                                     {% if check_enroll is None %}
                                         {% if user.is_authenticated %}
-                                            <a href="{% url 'checkout' course.id %}" class="main-btn">Enroll Now</a>
+                                            <a href="{% url 'enroll_course' course.id %}" class="main-btn">Enroll Now</a>
                                         {% else %}
                                             <a href="{% url 'register'  %}" class="main-btn">Enroll Now</a> <!-- Redirect to registration -->
                                         {% endif %}
@@ -430,17 +427,7 @@
                                         <button class="main-btn" disabled>Already Enrolled</button>
                                     {% endif %}
                                 </div>
-                                {% comment %} <div class="price-button pt-10">
-                                    {% if course.price == 0 %}
-                                        <span>Price : <b>Free</b></span>
-                                    {% else %}
-                                        <span>Price : 
-                                            <del>₹ {{ course.price }}</del> 
-                                            <b>₹ {% discount_calculation course.price course.discount %}</b>
-                                        </span>
-                                    {% endif %}
-                                    <a href="#" class="main-btn">Enroll Now</a>
-                                </div> {% endcomment %}
+                            
                             </div> <!-- course features -->
                         </div>
                         <div class="col-lg-12 col-md-6">
@@ -489,87 +476,6 @@
             </div> <!-- row -->
             <div class="row">
                 <div class="col-lg-8">
-                    {% comment %} <div class="releted-courses pt-95">
-                        <div class="title">
-                            <h3>Releted Courses</h3>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="singel-course mt-30">
-                                    <div class="thum">
-                                        <div class="image">
-                                            <img src="{% static 'images/course/cu-2.jpg' %}" alt="Course">
-                                        </div>
-                                        <div class="price">
-                                            <span>Free</span>
-                                        </div>
-                                    </div>
-                                    <div class="cont">
-                                        <ul>
-                                            <li><i class="fa fa-star"></i></li>
-                                            <li><i class="fa fa-star"></i></li>
-                                            <li><i class="fa fa-star"></i></li>
-                                            <li><i class="fa fa-star"></i></li>
-                                            <li><i class="fa fa-star"></i></li>
-                                        </ul>
-                                        <span>(20 Reviws)</span>
-                                        <a href="courses-singel.html"><h4>Learn basis javascirpt from start for beginner</h4></a>
-                                        <div class="course-teacher">
-                                            <div class="thum">
-                                                <a href="#"><img src="{% static 'images/course/teacher/t-2.jpg' %}" alt="teacher"></a>
-                                            </div>
-                                            <div class="name">
-                                                <a href="#"><h6>Mark anthem</h6></a>
-                                            </div>
-                                            <div class="admin">
-                                                <ul>
-                                                    <li><a href="#"><i class="fa fa-user"></i><span>31</span></a></li>
-                                                    <li><a href="#"><i class="fa fa-heart"></i><span>10</span></a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> 
-                            </div>
-                            <div class="col-md-6">
-                                <div class="singel-course mt-30">
-                                    <div class="thum">
-                                        <div class="image">
-                                            <img src="{% static 'images/course/cu-1.jpg' %}" alt="Course">
-                                        </div>
-                                        <div class="price">
-                                            <span>Free</span>
-                                        </div>
-                                    </div>
-                                    <div class="cont">
-                                        <ul>
-                                            <li><i class="fa fa-star"></i></li>
-                                            <li><i class="fa fa-star"></i></li>
-                                            <li><i class="fa fa-star"></i></li>
-                                            <li><i class="fa fa-star"></i></li>
-                                            <li><i class="fa fa-star"></i></li>
-                                        </ul>
-                                        <span>(20 Reviws)</span>
-                                        <a href="courses-singel.html"><h4>Learn basis javascirpt from start for beginner</h4></a>
-                                        <div class="course-teacher">
-                                            <div class="thum">
-                                                <a href="#"><img src="{% static 'images/course/teacher/t-3.jpg' %}" alt="teacher"></a>
-                                            </div>
-                                            <div class="name">
-                                                <a href="#"><h6>Mark anthem</h6></a>
-                                            </div>
-                                            <div class="admin">
-                                                <ul>
-                                                    <li><a href="#"><i class="fa fa-user"></i><span>31</span></a></li>
-                                                    <li><a href="#"><i class="fa fa-heart"></i><span>10</span></a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> 
-                            </div>
-                        </div> 
-                    </div>  {% endcomment %}
                 </div>
             </div> 
         </div> <!-- container -->
@@ -578,4 +484,4 @@
     <!--====== COURSES SINGEl PART ENDS ======-->
    
     <!--====== FOOTER PART START ======-->
-    {% endblock %}
+{% endblock %}

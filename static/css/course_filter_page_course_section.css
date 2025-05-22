@@ -86,3 +86,49 @@ background: #004494;
     object-fit: cover; /* Ensures the image fills the container without distortion */
     border-radius: 5px; /* Optional: for rounded corners */
 }
+/* Pagination Styles */
+.courses-pagination {
+    margin-top: 50px;
+}
+
+.courses-pagination .pagination {
+    display: flex;
+    justify-content: center;
+}
+
+.courses-pagination .page-item {
+    margin: 0 5px;
+}
+
+.courses-pagination .page-item .page-link {
+    color: #333;
+    background: #fff;
+    border: 1px solid #eee;
+    width: 40px;
+    height: 40px;
+    line-height: 38px;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.courses-pagination .page-item.active .page-link {
+    background: #2c7be5;
+    border-color: #2c7be5;
+    color: #fff;
+}
+
+.courses-pagination .page-item:hover .page-link {
+    background: #f1f1f1;
+    color: #2c7be5;
+}
+
+.courses-pagination .page-item.active:hover .page-link {
+    background: #2c7be5;
+    color: #fff;
+}
+
+.courses-pagination .page-item .page-link i {
+    font-size: 14px;
+}

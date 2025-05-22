@@ -14,6 +14,8 @@ from django.db.models.functions.mixins import (
     NumericOutputFieldMixin,
 )
 from .models import Teacher, Teacher_ProfilePermission
+from teacher.models import UserCourses, Course
+from django.db.models import Count
 
 
 
@@ -563,6 +565,7 @@ def delete_level(request, pk):
 
 
 # Add new Level
+@login_required
 def add_language(request):
     user = request.user
 
@@ -581,6 +584,8 @@ def add_language(request):
     else:
         form = LanguageForm()
     return render(request, 'teacher/language/add_language.html', {'form': form})
+
+
 
 def language_list(request):
     user = request.user
@@ -1486,3 +1491,15 @@ def verify_result(request, quiz_result_id):
             )
     print('reached')
     return redirect('quiz_results', quiz_id = quiz_result.quiz.id)
+
+
+def get_top_instructors():
+    top_instructors = (
+        Account.objects.filter(role='instructor')
+        .annotate(course_count=Count('instructor__course'))
+        .order_by('-course_count')[:4]
+    )
+    return top_instructors
+
+
+
